@@ -1,0 +1,44 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Zhangtejun.GitHub.io by zhangtejun</title>
+    <link rel="stylesheet" href="../stylesheets/styles.css">
+    <link rel="stylesheet" href="../stylesheets/github-dark.css">
+    <script src="../javascripts/jquery.min.js"></script>
+    <script src="../javascripts/respond.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="stylesheets/ie.css">
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  </head>
+  <body>
+      <div id="header">
+        <nav>
+          <li class="fork"><a href="https://github.com/zhangtejun">View On GitHub</a></li>
+        </nav>
+      </div><!-- end header -->
+
+    <div class="wrapper">
+        <section>
+        <div style="float: left;overflow: hidden;width: 15%;margin-top: 70px;padding: 20px 20px;max-width: 250px;">
+          <div>目录</div>
+          <div style="list-style-type:none!important;">        
+              <li>1，<a href="">README</a></li>
+              <li><a href="">1，README</a></li>           
+          </div>
+        </div>
+<div style="overflow: hidden;padding-left: 20px;width: 60%">
+
+        <div id="title">
+          <p>Java虚拟机学习（5）：内存调优</p>
+          <hr>
+          <span class="credits left">Project maintained by <a href="https://github.com/zhangtejun">zhangtejun</a></span>
+          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
+        </div>
+<p>JVM调优主要是针对内存管理方面的调优，包括控制各个代的大小，GC策略。由于GC开始垃圾回收时会挂起应用线程，严重影响了性能，调优的目是为了尽量降低GC所导致的应用线程暂停时间、 减少Full GC次数。</p><h3>代大小调优</h3><p>最关键参数：-Xms、 -Xmx 、-Xmn 、-XX:SurvivorRatio、-XX:MaxTenuringThreshold、-XX:PermSize、-XX:MaxPermSize</p><p>-Xms、 -Xmx 通常设置为相同的值，避免运行时要不断扩展JVM内存，这个值决定了JVM heap所能使用的最大内存。</p><p>-Xmn 决定了新生代空间的大小，新生代Eden、S0、S1三个区域的比率可以通过-XX:SurvivorRatio来控制(假如值为 4  表示：Eden:S0:S1 = 4:3:3 )</p><p>-XX:MaxTenuringThreshold 控制对象在经过多少次minor GC之后进入老年代，此参数只有在Serial 串行GC时有效。</p><p>-XX:PermSize、-XX:MaxPermSize 用来控制方法区的大小，通常设置为相同的值。</p><h3>1.避免新生代大小设置过小</h3><p>当新生代设置过小时，会产生两种比较明显的现象，一是minor GC次数频繁，二是可能导致 minor GC对象直接进入老年代。当老年代内存不足时，会触发Full GC。</p><h3>2.避免新生代设置过大</h3><p>新生代设置过大，会带来两个问题：一是老年大变小，可能导致Full  GC频繁执行；二是 minor GC 执行回收的时间大幅度增加。</p><h3>3.避免Survivor区过大或过小</h3><p>-XX:SurvivorRatio参数的值越大，就意味着Eden区域变大，minor GC次数会降低，但两块Survivor区域变小，如果超过Survivor区域内存大小的对象在minor GC后仍没被回收，则会直接进入老年代，</p><p>-XX:SurvivorRatio参数值设置过小，就意味着Eden区域变小，minor GC触发次数会增加，Survivor区域变大，意味着可以存储更多在minor GC后任存活的对象，避免其进入老年代。</p><h3>4.合理设置对象在新生代存活的周期</h3><p>新生代存活周期的值决定了新生代对象在经过多少次Minor GC后进入老年代。因此这个值要根据自己的应用来调优，Jvm参数上这个值对应的为-XX:MaxTenuringThreshold，默认值为15次。</p><h3>GC调优</h3><h3>1.GC搭配</h3><p>参见另一遍垃圾收集器</p><h3>2.查看JVM参数</h3><p>命令行工具   可视化工具</p><h3>3.GC日志参数</h3><pre>-XX:+PrintGCDetails</pre><pre>-XX:+PrintGCTimeStamps</pre><pre>-Xloggc:c:\Java\gc.log</pre></div></section></div></body></html>
