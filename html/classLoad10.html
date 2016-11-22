@@ -143,5 +143,4 @@ protected final Class<?> defineClass(String name, byte[] b, int off, int len,
     postDefineClass(c, protectionDomain);  
     return c;  
     }
-
                       </pre><p>resolveClass 此方法负责完成Class对象的链接，如果链接过，则直接返回。</p><h3>常见异常：</h3><p>ClassNotFoundException  这是最常见的异常，产生这个异常的原因为在当前的ClassLoader 中加载类时，未找到类文件，</p><p>NoClassDefFoundError  这个异常是因为  加载到的类中引用到的另外类不存在，例如要加载A，而A中盗用了B，B不存在或当前的ClassLoader无法加载B，就会抛出这个异常。</p><p>LinkageError 该异常在自定义ClassLoader的情况下更容易出现，主要原因是此类已经在ClassLoader加载过了，重复的加载会造成该异常。</p></div></section></div></body></html>
