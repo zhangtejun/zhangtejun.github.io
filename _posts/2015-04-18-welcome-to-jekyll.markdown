@@ -189,7 +189,7 @@ body {
   margin-bottom: 120px;
 }
 {% endhighlight %}
-<img src="{{ site.logo | prepend: site.baseurl }}">
+<img src="{{ site.position | prepend: site.baseurl }}">
 
 
 
