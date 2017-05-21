@@ -11,7 +11,7 @@ exclude:
 # Site settings
 title: jekyll-blog
 subtitle: "A simple yet classy theme for Jekyll  blog"
-email: blcentra@gmail.com
+email: 1053946416@qq.com
 name: zhtjun
 description: >
   A simple yet classy theme for your Jekyll website or blog.
@@ -79,7 +79,7 @@ social:
 
   - name: Facebook
     icon: facebook
-    username: thebencentra
+    username: zhangtejun
     url:
     desc: Friend me on Facebook
     share: true
