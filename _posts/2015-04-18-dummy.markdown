@@ -3,7 +3,7 @@ layout: post
 title:  "Dummy1 Post"
 date:   2015-04-18 08:43:59
 author: zhang
-categories: Dummy
+categories: zhang
 ---
 
 This is just a dummy post. Lorem ipsum and all the rest.
