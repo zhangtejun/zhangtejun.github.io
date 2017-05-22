@@ -5,6 +5,11 @@ date:   2017-05-22 10:25:20
 author: zhang
 categories: zhang
 ---
+<ul>
+<li><a href="http://www.imooc.com/learn/9">幕课网 - HTML+CSS基础课程</a>：偏基础，可以在线练习和预览</li>
+<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/Guide/CSS/Getting_started">MDN - CSS入门教程</a>: MDN 的官方文档</li>
+<li><a href="http://zh.learnlayout.com/">学习 CSS 布局</a>：排版和配色特别舒服，简短但不深入，适合概览入门</li>
+</ul>
 ### "display"属性
 
 `display` 是CSS中最重要的用于控制布局的属性。每个元素都有一个默认的 `display` 值，这与元素的类型有关。对于大多数元素它们的默认值通常是 `block` 或 `inline` 。一个 `block` 元素通常被叫做块级元素。一个 `inline` 元素通常被叫做行内元素。
