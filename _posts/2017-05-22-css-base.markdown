@@ -1,15 +1,25 @@
 ---
 layout: post
-title:  "Css 布局!"
+title:  "Css 基础!"
 date:   2017-05-22 10:25:20
 author: zhang
 categories: zhang
 ---
+#### CSS 基础知识参考
 <ul>
 <li><a href="http://www.imooc.com/learn/9">幕课网 - HTML+CSS基础课程</a>：偏基础，可以在线练习和预览</li>
 <li><a href="https://developer.mozilla.org/zh-CN/docs/Web/Guide/CSS/Getting_started">MDN - CSS入门教程</a>: MDN 的官方文档</li>
 <li><a href="http://zh.learnlayout.com/">学习 CSS 布局</a>：排版和配色特别舒服，简短但不深入，适合概览入门</li>
 </ul>
+#### CSS 定位问题
+主要就是经典的绝对定位，相对定位问题
+<ul>
+<li><a href="http://www.barelyfitz.com/screencast/html-training/css/positioning/">10个文档学布局</a>：通过十个例子讲解布局，主要涉及相对布局，绝对布局，浮动。</li>
+<li><a href="http://ife.baidu.com/note/detail/id/662">百度前端学院笔记 - 理解绝对定位</a>：文章本身一般，几篇参考文献比较详细</li>
+<li><a href="http://www.w3cplus.com/css/advanced-html-css-lesson2-detailed-css-positioning.html">HTML和CSS高级指南之二——定位详解</a>（译文）：介绍浮动的使用，详细介绍定位的技巧，包括如何准确的给元素在 X 轴、Y 轴和 Z 轴定位</li>
+</ul>
+
+
 ### "display"属性
 
 `display` 是CSS中最重要的用于控制布局的属性。每个元素都有一个默认的 `display` 值，这与元素的类型有关。对于大多数元素它们的默认值通常是 `block` 或 `inline` 。一个 `block` 元素通常被叫做块级元素。一个 `inline` 元素通常被叫做行内元素。
@@ -440,6 +450,28 @@ nav {
           justify-content: center;
 }
 {% endhighlight %}
+
+### 一、margin为负值产生的影响
+#### 对于自身的影响
+当元素不存在width属性或者（`width：auto`）的时候，负margin会增加元素的`宽度`.
+
+margin-left和margin-right都是可以增加宽度
+
+注意：
+* margin-top为负值不会增加高度，只会产生向上位移
+* margin-bottom为负值不会产生位移，会减少自身的供css读取的高度
+
+#### 对文档流的影响
+
+元素如果用了`margin-left:-20px;`毋庸置疑的自身会向左偏移20px和定位`（position：relative）`有点不一样的是，在其后面的元素会补位，也就是后面的行内元素会紧贴在此元素的之后。总结，不脱离文档流不使用`float`的话，`负margin`元素是不会破坏页面的文档流。
+
+#### 对浮动元素的影响
+`负margin`会改变浮动元素的显示位置，即使我的元素写在DOM的后面，我也能让它显示在最前面。圣杯布局、双飞翼布局啊什么的，都是利用这个原理实现的。
+
+#### 对绝对定位影响
+对于绝对定位元素，负margin会基于其绝对定位坐标再偏移，
+唯有的缺点就是你必须知道这个觉得定位元素宽度的和高度才能并设置负margin值使其居中浏览器窗口，
+
 
 
 
