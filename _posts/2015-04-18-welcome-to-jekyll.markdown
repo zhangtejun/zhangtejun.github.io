@@ -2,7 +2,8 @@
 layout: post
 title:  "Css 布局!"
 date:   2017-05-21 10:25:39 +0800
-categories: jekyll update
+author: zhang
+categories: zhang
 ---
 ### "display"属性
 
@@ -14,7 +15,8 @@ categories: jekyll update
 
 #### inline
 
-`span` 是一个标准的行内元素。一个行内元素可以在段落中 <span> 像这样 </span> 包裹一些文字而不会打乱段落的布局。 `a` 元素是最常用的行内元素，它可以被用作链接。
+`span` 是一个标准
+的行内元素。一个行内元素可以在段落中 <span> 像这样 </span> 包裹一些文字而不会打乱段落的布局。 `a` 元素是最常用的行内元素，它可以被用作链接。
 
 #### none
 
