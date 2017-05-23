@@ -7,7 +7,6 @@ categories: zhangtejun
 ---
 # JavaScript深入之词法作用域和动态作用域
 
-
 ## 作用域
 
 作用域是指程序源代码中定义变量的区域。
