@@ -1,3 +1,5 @@
+转载：[http://www.tuicool.com/articles/juUjInn](http://www.tuicool.com/articles/juUjInn)
+
 Markdown
 是一种轻量级标记语言。它允许人们“使用易读易写的纯文本格式编写文档，然后转换成有效的XHTML(或者HTML)文档”。这种语言吸收了很多在电子邮件中已有的纯文本标记的特性。由于其编写方便，并且支持代码高亮等功能，尤其受到开发人员的青睐。渐渐成为开发人员写文章、博客等的必备工具。
 
