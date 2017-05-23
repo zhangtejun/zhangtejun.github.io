@@ -71,7 +71,7 @@ console.log(person.__proto__ === Person.prototype); // true
 
 于是我们更新下关系图：
 
-![实例与实例原型的关系图](https://github.com/mqyqingfeng/Blog/raw/master/Images/prototype2.png)
+![实例与实例原型的关系图]({{ site.prototype2 | prepend: site.baseurl }})
 
 既然实例对象和构造函数都可以指向原型，那么原型是否有属性指向构造函数或者实例呢？
 
@@ -90,7 +90,7 @@ console.log(Person === Person.prototype.constructor); // true
 
 所以再更新下关系图：
 
-![实例原型与构造函数的关系图](https://github.com/mqyqingfeng/Blog/raw/master/Images/prototype3.png)
+![实例原型与构造函数的关系图]({{ site.prototype3 | prepend: site.baseurl }})
 
 综上我们已经得出：
 
@@ -149,7 +149,7 @@ console.log(obj.name) // Kevin
 
 所以原型对象是通过 Object 构造函数生成的，结合之前所讲，实例的 \_\_proto\_\_ 指向构造函数的 prototype ，所以我们再更新下关系图：
 
-![原型的原型关系图](https://github.com/mqyqingfeng/Blog/raw/master/Images/prototype4.png)
+![原型的原型关系图]({{ site.prototype4 | prepend: site.baseurl }})
 
 ## 原型链
 
@@ -165,7 +165,7 @@ console.log(Object.prototype.__proto__ === null) // true
 
 所以最后一张关系图就是
 
-![原型链示意图](https://github.com/mqyqingfeng/Blog/raw/master/Images/prototype5.png)
+![原型链示意图]({{ site.prototype5 | prepend: site.baseurl }})
 
 顺便还要说一下，图中由相互关联的原型组成的链状结构就是原型链，也就是蓝色的这条线。
 
