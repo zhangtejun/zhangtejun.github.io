@@ -7,7 +7,7 @@ categories: zhangtj
 ---
 **内存空间详细图解**
 <pre>
-<code class="java">
+<code class="java" style="display:none">
 public class HelloWorld {
     /**
     * 输出一行字符串“Hello World!”
@@ -19,33 +19,8 @@ public class HelloWorld {
 }
 </code>
 </pre>
-```
-<code class="java">
-public class HelloWorld {
-    /**
-    * 输出一行字符串“Hello World!”
-    * @param args
-    */
-    public static void main(String[] args) {
-         System.out.println("Hello World!");
-    }
-}
-</code>
-```
-```
-public class HelloWorld {
-    /**
-    * 输出一行字符串“Hello World!”
-    * @param args
-    */
-    public static void main(String[] args) {
-         System.out.println("Hello World!");
-    }
-}
-```
-变量对象与堆内存
 
-<code>
+变量对象与堆内存
 var a = 20;
 var b = 'abc';
 var c = true;
