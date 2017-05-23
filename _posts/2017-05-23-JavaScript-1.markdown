@@ -5,7 +5,7 @@ date:   2017-05-23 13:35:21
 author: zhangtejun
 categories: zhangtejun
 ---
-# JavaScript深入之从原型到原型链
+# JavaScript之原型到原型链
 
 ## 构造函数创建对象
 
