@@ -2,7 +2,7 @@
 ---
 layout: post
 title:  "6.JavaScript-ECMAScript规范解读this"
-date:   2017-05-23 13:35:21
+date:   2017-05-23 16:58:30
 author: zhangtejun
 categories: zhangtejun
 ---
