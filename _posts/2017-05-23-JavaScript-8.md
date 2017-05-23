@@ -1,4 +1,3 @@
-
 ---
 layout: post
 title:  "8.JavaScript-闭包"
