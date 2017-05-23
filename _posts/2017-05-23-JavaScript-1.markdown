@@ -49,7 +49,7 @@ console.log(person2.name) // Kevin
 
 让我们用一张图表示构造函数和实例原型之间的关系：
 
-![构造函数和实例原型的关系图](https://github.com/mqyqingfeng/Blog/raw/master/Images/prototype1.png)
+![构造函数和实例原型的关系图]({{ site.prototype1 | prepend: site.baseurl }})
 
 在这张图中我们用 Object.prototype 表示实例原型。
 

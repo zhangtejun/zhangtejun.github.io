@@ -27,6 +27,18 @@ url: "http://zhangtejun.github.io" # the base hostname & protocol for your site
 cover: "/assets/header_image.jpg"
 logo: "/assets/logo.png"
 position: "/assets/position.png"
+prototype1: "/assets/prototype1.png"
+prototype2: "/assets/prototype2.png"
+prototype3: "/assets/prototype3.png"
+prototype4: "/assets/prototype4.png"
+prototype5: "/assets/prototype5.png"
+
+
+
+
+
+
+
 # Build settings
 markdown: kramdown
 paginate: 5
