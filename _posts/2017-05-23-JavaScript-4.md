@@ -1,4 +1,3 @@
-
 ---
 layout: post
 title:  "4.JavaScript-变量对象"
