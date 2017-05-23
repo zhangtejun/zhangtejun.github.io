@@ -19,6 +19,7 @@ public class HelloWorld {
 }
 </code>
 </pre>
+```
 <code class="java">
 public class HelloWorld {
     /**
@@ -30,6 +31,18 @@ public class HelloWorld {
     }
 }
 </code>
+```
+```
+public class HelloWorld {
+    /**
+    * 输出一行字符串“Hello World!”
+    * @param args
+    */
+    public static void main(String[] args) {
+         System.out.println("Hello World!");
+    }
+}
+```
 变量对象与堆内存
 
 <code>
