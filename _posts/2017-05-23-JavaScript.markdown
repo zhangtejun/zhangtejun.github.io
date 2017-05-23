@@ -9,6 +9,12 @@ categories: zhangtj
 
 变量对象与堆内存
 
+<code>
+var a = 20;
+var b = 'abc';
+var c = true;
+var d = { m: 20 }
+</code>
 > **var** a = 20;
 >
 > **var** b = 'abc';
