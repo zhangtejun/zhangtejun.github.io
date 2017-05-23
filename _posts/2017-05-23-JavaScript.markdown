@@ -6,7 +6,30 @@ author: zhangtj
 categories: zhangtj
 ---
 **内存空间详细图解**
-
+<pre>
+<code class="java">
+public class HelloWorld {
+    /**
+    * 输出一行字符串“Hello World!”
+    * @param args
+    */
+    public static void main(String[] args) {
+         System.out.println("Hello World!");
+    }
+}
+</code>
+</pre>
+<code class="java">
+public class HelloWorld {
+    /**
+    * 输出一行字符串“Hello World!”
+    * @param args
+    */
+    public static void main(String[] args) {
+         System.out.println("Hello World!");
+    }
+}
+</code>
 变量对象与堆内存
 
 <code>
