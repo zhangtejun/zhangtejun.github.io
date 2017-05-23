@@ -1,0 +1,116 @@
+Markdown
+是一种轻量级标记语言。它允许人们“使用易读易写的纯文本格式编写文档，然后转换成有效的XHTML(或者HTML)文档”。这种语言吸收了很多在电子邮件中已有的纯文本标记的特性。由于其编写方便，并且支持代码高亮等功能，尤其受到开发人员的青睐。渐渐成为开发人员写文章、博客等的必备工具。
+
+我相信大部分开发人员在写个人博客或者技术文章的时候都跟我一样：
+
+在电脑上使用 ***macdown*** 、 ***mou*** 等软件中使用Markdown语法写内容，然后将写好的文章内容粘贴到支持markdown语法的个人网站中。
+
+但是，除了可以在支持markdown语法的地方可以正常显示之外，在其他任何地方，使用markdown格式写出来的内容的可读性都比较低。今天，给大家推荐一款神器—— ***Pandoc***
+
+Pandoc是由John
+MacFarlane开发的标记语言转换工具，可实现不同标记语言间的格式转换，堪称该领域中的“瑞士军刀”。Pandoc使用Haskell语言编写，以命令行形式实现与用户的交互，可支持多种操作系统；Pandoc采用GNU
+GPL授权协议发布，属于自由软件。
+
+**Pandoc的功能**
+----------------
+
+pandoc可以在以下格式中任意转换：
+
+![IMG\_256](media/image1.png){width="5.729166666666667in"
+height="1.9375in"}
+
+**Pandoc的安装**
+----------------
+
+Pandoc提供以下安装方式（如果需要输出PDF文档，则除Pandoc本身以外，还应另外安装 ***LaTeX*** 套件）：
+
+### **Windows及Mac OS X**
+
+下载 ***安装包*** 并执行安装程序。
+
+### **Linux**
+
+尝试使用Linux发行版的软件管理工具安装，目前Pandoc已加入Debian、Ubuntu、Slackware、Arch、Fedora、NiXOS和gentoo的软件仓库。如果无法通过软件管理工具直接安装Pandoc，则可采取下面介绍的全平台安装方式，即首先安装Haskell平台，再在其基础上安装Pandoc。绝大多数Linux发行版的软件仓库中都包含Haskell平台。
+
+### **BSD**
+
+FreeBSD和NetBSD的软件仓库中已包含Pandoc，可直接安装。
+
+### **全平台**
+
+首先安装Haskell平台，之后使用cabal工具安装最新版本的Pandoc：
+
+**cabal update**
+
+**cabal install pandoc**
+
+**Pandoc的使用**
+----------------
+
+Pandoc的基本指令格式是：
+
+**pandoc \[options\] \[input-file\] ...**
+
+简单的格式转换指令：
+
+**pandoc -o output.html input.md**
+
+其中 **-o ouput.html** 表示输出文件为output.html，input.md是输入文件。
+
+Pandoc会根据文件的后缀名自动判断格式，用户也可以显式地指定输入文件和输出文件格式：
+
+**pandoc -f markdown -t html -o output.html input.md**
+
+其中 **-f markdown** 表示输入文件格式为Markdown， **-t
+html** 表示输出文件格式为HTML。
+
+**常用命令**
+------------
+
+### **Markdown转html**
+
+**pandoc README.md -o README.html**
+
+### **Markdown转word**
+
+**pandoc README.md -o README.docx**
+
+### **Markdown转word**
+
+首先安装安装LaTex
+
+**pandoc README.md --latex-engine=xelatex -o README.pdf**
+
+### **Markdown转在线PPT**
+
+一、采用默认模板渲染一个独立的DZSlides幻灯片：
+
+**pandoc README.md -o README.html -t dzslides -s**
+
+二、使用带样式的模板
+
+首先需要从GitHub上获取https://github.com/hakimel/reveal.js
+
+**git clone https://github.com/hakimel/reveal.js**
+
+渲染幻灯片：
+
+**pandoc slides.md -o slides.html -t revealjs -s**
+
+除了默认的外观主题以外，reveal.js还提供了多个主题可供选择，
+
+**pandoc README.md -o README.html -t revealjs -s -V theme=beige**
+
+default：（默认）深灰色背景，白色文字
+
+beige：米色背景，深色文字
+
+sky：天蓝色背景，白色细文字
+
+night：黑色背景，白色粗文字
+
+serif：浅色背景，灰色衬线文字
+
+simple：白色背景，黑色文字
+
+solarized：奶油色背景，深青色文字
