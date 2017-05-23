@@ -2,7 +2,7 @@
 ---
 layout: post
 title:  "8.JavaScript-闭包"
-date:   2017-05-23 13:35:21
+date:   2017-05-23 16:59:12
 author: zhangtejun
 categories: zhangtejun
 ---
