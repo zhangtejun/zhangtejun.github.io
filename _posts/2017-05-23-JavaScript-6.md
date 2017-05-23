@@ -1,4 +1,3 @@
-
 ---
 layout: post
 title:  "6.JavaScript-ECMAScript规范解读this"
