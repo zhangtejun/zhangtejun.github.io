@@ -178,6 +178,12 @@ console.log(obj.name) // hehe
 ![原型的原型关系图]({{ site.prototype4 | prepend: site.baseurl }})
 
 ## 原型链
+```
+function fn(){};
+var test = new fn();
+```
+把这个有`__proto__`串起来的直到`Object.prototype.__proto__`为`null`的链叫做原型链。原型链实际上就是js中数据继承的继承链。
+![原型链关系图]({{ site.prototype6 | prepend: site.baseurl }})
 
 那 Object.prototype 的原型呢？
 
