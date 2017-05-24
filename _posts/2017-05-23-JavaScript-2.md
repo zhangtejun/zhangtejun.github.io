@@ -5,7 +5,7 @@ date:   2017-05-23 13:35:21
 author: zhangtejun
 categories: zhangtejun
 ---
-# JavaScript深入之词法作用域和动态作用域
+# JavaScript之词法作用域和动态作用域
 
 ## 作用域
 
@@ -68,7 +68,6 @@ function bar () {
 bar
 ```
 
-这个文件也可以在[github博客仓库](https://github.com/mqyqingfeng/Blog/blob/master/demos/scope/scope.bash)中找到。
 
 ## 思考题
 
@@ -111,18 +110,4 @@ JavaScript 函数的执行用到了作用域链，这个作用域链是在函数
 但是在这里真正想让大家思考的是：
 
 虽然两段代码执行的结果一样，但是两段代码究竟有哪些不同呢？
-
-如果要回答这个问题，就要牵涉到很多的内容，词法作用域只是其中的一小部分，让我们期待下一篇文章————《JavaScript深入之执行上下文栈》。
-
-## 下一篇文章
-
-[JavaScript深入之执行上下文栈](https://github.com/mqyqingfeng/Blog/issues/4)
-
-## 深入系列
-
-JavaScript深入系列目录地址：[https://github.com/mqyqingfeng/Blog](https://github.com/mqyqingfeng/Blog)。
-
-JavaScript深入系列预计写十五篇左右，旨在帮大家捋顺JavaScript底层知识，重点讲解如原型、作用域、执行上下文、变量对象、this、闭包、按值传递、call、apply、bind、new、继承等难点概念。
-
-如果有错误或者不严谨的地方，请务必给予指正，十分感谢。如果喜欢或者有所启发，欢迎star，对作者也是一种鼓励。
 

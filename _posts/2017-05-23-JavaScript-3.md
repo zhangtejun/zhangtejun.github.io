@@ -5,28 +5,21 @@ date:   2017-05-23 16:42:52
 author: zhangtejun
 categories: zhangtejun
 ---
-# JavaScript深入之执行上下文栈
+# JavaScript之执行上下文栈
 
 ## 顺序执行？
 
 如果要问到 JavaScript 代码执行顺序的话，想必写过 JavaScript 的开发者都会有个直观的印象，那就是顺序执行，毕竟：
 
 ```js
-var foo = function () {
-
-    console.log('foo1');
-
-}
-
-foo();  // foo1
+var abc =1;
 
 var foo = function () {
-
-    console.log('foo2');
-
+    console.log(abc);
+	var abc =1;
 }
 
-foo(); // foo2
+foo(); // undefined
 ```
 
 然而去看这段代码：
@@ -34,17 +27,13 @@ foo(); // foo2
 ```js
 
 function foo() {
-
     console.log('foo1');
-
 }
 
 foo();  // foo2
 
 function foo() {
-
     console.log('foo2');
-
 }
 
 foo(); // foo2
@@ -62,10 +51,19 @@ foo(); // foo2
 ## 可执行代码
 
 这就要说到 JavaScript 的可执行代码(executable code)的类型有哪些了？
+每次当控制器转到可执行代码的时候，就会进入一个执行上下文。执行上下文可以理解为当前代码的执行环境，它会形成一个作用域。
 
-其实很简单，就三种，全局代码、函数代码、eval代码。
+其实很简单，就三种，
+1. 全局代码:`JavaScript`代码运行起来会首先进入该环境
+2. 函数代码:当函数被调用执行时，会进入当前函数中执行代码
+3. eval代码:
 
-举个例子，当执行到一个函数的时候，就会进行准备工作，这里的“准备工作”，让我们用个更专业一点的说法，就叫做"执行上下文(execution contexts)"。
+因此在一个JavaScript程序中，必定会产生多个执行上下文，在我的上一篇文章中也有提到，JavaScript引擎会以堆栈的方式来处理它们，这个堆栈，我们称其为函数调用栈(call stack)。
+栈底永远都是全局上下文，而栈顶就是当前正在执行的上下文。
+
+当代码在执行过程中，遇到以上三种情况，都会生成一个执行上下文，放入栈中，而处于栈顶的上下文执行完毕之后，就会自动出栈。
+
+举个例子，当执行到一个函数的时候，就会进行准备工作，这里的“准备工作”，让我们用个更专业一点的说法，就叫做"执行上下文(execution context)"。
 
 ## 执行上下文栈
 
@@ -116,7 +114,7 @@ ECStack.push(<fun1> functionContext);
 // fun1中竟然调用了fun2，还要创建fun2的执行上下文
 ECStack.push(<fun2> functionContext);
 
-// 擦，fun2还调用了fun3！
+//fun2还调用了fun3！
 ECStack.push(<fun3> functionContext);
 
 // fun3执行完毕
@@ -130,10 +128,37 @@ ECStack.pop();
 
 // javascript接着执行下面的代码，但是ECStack底层永远有个globalContext
 ```
+再看一个例子：
+```
+var color = 'blue';
+ 
+function changeColor() {
+    var anotherColor = 'red';
+ 
+    function swapColors() {
+        var tempColor = anotherColor;
+        anotherColor = color;
+        color = tempColor;
+    }
+ 
+    swapColors();
+}
+ 
+changeColor();
+```
+我们用ECStack来表示处理执行上下文组的堆栈.
+### 第一步：全局上下文入栈
+#### 全局上下文入栈之后，其中的可执行代码开始执行，直到遇到了changeColor()，这一句激活函数changeColor创建它自己的执行上下文，因此第二步就是changeColor的执行上下文入栈。
+### 第二步：changeColor的执行上下文入栈
+#### changeColor的上下文入栈之后，控制器开始执行其中的可执行代码，遇到swapColors()之后又激活了一个执行上下文。因此第三步是swapColors的执行上下文入栈。
+### 第三步：swapColors的执行上下文入栈
+#### 在swapColors的可执行代码中，再没有遇到其他能生成执行上下文的情况，因此这段代码顺利执行完毕，swapColors的上下文从栈中弹出。
+### 第四步：swapColors的执行上下文出栈
+#### swapColors的执行上下文弹出之后，继续执行changeColor的可执行代码，也没有再遇到其他执行上下文，顺利执行完毕之后弹出。这样，ECStack中就只身下全局上下文了。
+### 第五步：changeColor的执行上下文出栈
+#### 全局上下文在浏览器窗口关闭后出栈。
 
 ## 解答思考题
-
-好啦，现在我们已经了解了执行上下文栈是如何处理执行上下文的，所以让我们看看上篇文章[《JavaScript深入之词法作用域和动态作用域》](https://github.com/mqyqingfeng/Blog/issues/3)最后的问题：
 
 ```js
 var scope = "global scope";
