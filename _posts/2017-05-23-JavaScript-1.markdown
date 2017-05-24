@@ -7,17 +7,19 @@ categories: zhangtejun
 ---
 # JavaScript之原型到原型链
 
+js原生类型与对象类型，原生类型包括：number，string, bool, null, undefined；
+剩下的非原生类型对象都属于对象类型，包括：object, array, function等
+
 ## 构造函数创建对象
 
 我们先使用构造函数创建一个对象：
 
 ```js
 function Person() {
-
 }
 var person = new Person();
-person.name = 'Kevin';
-console.log(person.name) // Kevin
+person.name = 'hehe';
+console.log(person.name) // hehe
 ```
 
 在这个例子中，Person 就是一个构造函数，我们使用 new 创建了一个实例对象 person。
@@ -30,20 +32,43 @@ console.log(person.name) // Kevin
 
 ```js
 function Person() {
-
-}
-// 虽然写在注释里，但是你要注意：
+	//这里的this指向了谁?
+    this.name = name;
+    this.age = age; 
+}：
 // prototype是函数才会有的属性
-Person.prototype.name = 'Kevin';
+Person.prototype.name = 'hehe';
 var person1 = new Person();
 var person2 = new Person();
-console.log(person1.name) // Kevin
-console.log(person2.name) // Kevin
+console.log(person1.name) // hehe
+console.log(person2.name) // hehe
+```
+
+在JavaScript中，每个函数 都有一个prototype属性，当一个函数被用作构造函数来创建实例时，
+这个函数的prototype属性值会被作为原型赋值给所有对象实例（也就是设置 实例的`__proto__`属性），
+也就是说，所有实例的原型引用的是函数的prototype属性。即
+```
+/** 对于所有的对象，都有__proto__属性，这个属性对应该对象的原型.**/
+
+//函数对象 有__proto__属性和prototype原型
+Person.__proto__ === Function.prototype;//true
+//person1 是object 有__proto__属性
+person1.__proto__ === Person.prototype;//true
+```
+原始对象的__proto__属性为null,并且没有原型对象。(Object.prototype.__proto__为null)
+所有的对象都继承自原始对象;Object比较特殊，他的原型对象也就是原始对象;所以我们往往用Object.prototype表示原始对象。
+
+所有的函数对象都继承制原始函数对象；Function比较特殊，他的原型对象也就是原始函数对象；
+所以我们往往用Function.prototype表示原始函数对象；而原始函数对象又继承自原始对象。
+ 
+ ```
+ //而原始函数对象又继承自原始对象
+Function.prototype.__proto__ === Object.prototype;//true
 ```
 
 那这个函数的 prototype 属性到底指向的是什么呢？是这个函数的原型吗？
 
-其实，函数的 prototype 属性指向了一个对象，这个对象正是调用该构造函数而创建的**实例**的原型，也就是这个例子中的 person1 和 person2 的原型。
+其实，js每声明一个function，都有原型prototype，函数的 prototype 属性指向了一个对象(Object)，这个对象正是调用该构造函数而创建的**实例**的原型，也就是这个例子中的 person1 和 person2 的原型。
 
 那什么是原型呢？你可以这样理解：每一个JavaScript对象(null除外)在创建的时候就会与之关联另一个对象，这个对象就是我们所说的原型，每一个对象都会从原型"继承"属性。
 
@@ -103,7 +128,7 @@ var person = new Person();
 
 console.log(person.__proto__ == Person.prototype) // true
 console.log(Person.prototype.constructor == Person) // true
-// 顺便学习一个ES5的方法,可以获得对象的原型
+// ES5获得对象的原型
 console.log(Object.getPrototypeOf(person) === Person.prototype) // true
 ```
 
@@ -120,7 +145,7 @@ function Person() {
 
 }
 
-Person.prototype.name = 'Kevin';
+Person.prototype.name = 'hehe';
 
 var person = new Person();
 
@@ -128,12 +153,13 @@ person.name = 'Daisy';
 console.log(person.name) // Daisy
 
 delete person.name;
-console.log(person.name) // Kevin
+console.log(person.name) // hehe
 ```
+补充：[delete](http://note.youdao.com/noteshare?id=faba216dff3a0d016b33c3a9a0d04e5f)
 
 在这个例子中，我们给实例对象 person 添加了 name 属性，当我们打印 person.name 的时候，结果自然为 Daisy。
 
-但是当我们删除了 person 的 name 属性时，读取 person.name，从 person 对象中找不到 name 属性就会从 person 的原型也就是 person.\_\_proto\_\_ ，也就是 Person.prototype中查找，幸运的是我们找到了  name 属性，结果为 Kevin。
+但是当我们删除了 person 的 name 属性时，读取 person.name，从 person 对象中找不到 name 属性就会从 person 的原型也就是 person.\_\_proto\_\_ ，也就是 Person.prototype中查找，幸运的是我们找到了  name 属性，结果为 hehe。
 
 但是万一还没有找到呢？原型的原型又是什么呢？
 
@@ -143,8 +169,8 @@ console.log(person.name) // Kevin
 
 ```js
 var obj = new Object();
-obj.name = 'Kevin'
-console.log(obj.name) // Kevin
+obj.name = 'hehe'
+console.log(obj.name) // hehe
 ```
 
 所以原型对象是通过 Object 构造函数生成的，结合之前所讲，实例的 \_\_proto\_\_ 指向构造函数的 prototype ，所以我们再更新下关系图：
@@ -201,14 +227,4 @@ person.constructor === Person.prototype.constructor
 
 继承意味着复制操作，然而 JavaScript 默认并不会复制对象的属性，相反，JavaScript 只是在两个对象之间创建一个关联，这样，一个对象就可以通过委托访问另一个对象的属性和函数，所以与其叫继承，委托的说法反而更准确些。
 
-## 下一篇文章
-
-[JavaScript深入之词法作用域和动态作用域](https://github.com/mqyqingfeng/Blog/issues/3)
-
-## 深入系列
-
-JavaScript深入系列目录地址：[https://github.com/mqyqingfeng/Blog](https://github.com/mqyqingfeng/Blog)。
-
-JavaScript深入系列预计写十五篇左右，旨在帮大家捋顺JavaScript底层知识，重点讲解如原型、作用域、执行上下文、变量对象、this、闭包、按值传递、call、apply、bind、new、继承等难点概念。
-
-如果有错误或者不严谨的地方，请务必给予指正，十分感谢。如果喜欢或者有所启发，欢迎star，对作者也是一种鼓励。
+[参考部分链接](https://github.com/mqyqingfeng/Blog)
