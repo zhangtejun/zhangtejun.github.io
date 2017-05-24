@@ -147,16 +147,16 @@ function changeColor() {
 changeColor();
 ```
 我们用ECStack来表示处理执行上下文组的堆栈.
-### 第一步：全局上下文入栈
-#### 全局上下文入栈之后，其中的可执行代码开始执行，直到遇到了changeColor()，这一句激活函数changeColor创建它自己的执行上下文，因此第二步就是changeColor的执行上下文入栈。
-### 第二步：changeColor的执行上下文入栈
-#### changeColor的上下文入栈之后，控制器开始执行其中的可执行代码，遇到swapColors()之后又激活了一个执行上下文。因此第三步是swapColors的执行上下文入栈。
-### 第三步：swapColors的执行上下文入栈
-#### 在swapColors的可执行代码中，再没有遇到其他能生成执行上下文的情况，因此这段代码顺利执行完毕，swapColors的上下文从栈中弹出。
-### 第四步：swapColors的执行上下文出栈
-#### swapColors的执行上下文弹出之后，继续执行changeColor的可执行代码，也没有再遇到其他执行上下文，顺利执行完毕之后弹出。这样，ECStack中就只身下全局上下文了。
-### 第五步：changeColor的执行上下文出栈
-#### 全局上下文在浏览器窗口关闭后出栈。
+##### 第一步：全局上下文入栈
+###### 全局上下文入栈之后，其中的可执行代码开始执行，直到遇到了changeColor()，这一句激活函数changeColor创建它自己的执行上下文，因此第二步就是changeColor的执行上下文入栈。
+##### 第二步：changeColor的执行上下文入栈
+###### changeColor的上下文入栈之后，控制器开始执行其中的可执行代码，遇到swapColors()之后又激活了一个执行上下文。因此第三步是swapColors的执行上下文入栈。
+##### 第三步：swapColors的执行上下文入栈
+###### 在swapColors的可执行代码中，再没有遇到其他能生成执行上下文的情况，因此这段代码顺利执行完毕，swapColors的上下文从栈中弹出。
+##### 第四步：swapColors的执行上下文出栈
+###### swapColors的执行上下文弹出之后，继续执行changeColor的可执行代码，也没有再遇到其他执行上下文，顺利执行完毕之后弹出。这样，ECStack中就只身下全局上下文了。
+##### 第五步：changeColor的执行上下文出栈
+###### 全局上下文在浏览器窗口关闭后出栈。
 
 ## 解答思考题
 
