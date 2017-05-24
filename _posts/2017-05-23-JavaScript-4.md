@@ -73,7 +73,8 @@ testEC = {
 ```
 // VO 为 Variable Object的缩写，即变量对象
 VO = {
-    arguments: {...},  //注：在浏览器的展示中，函数的参数可能并不是放在arguments对象中，这里为了方便理解，我做了这样的处理
+    arguments: {...},  //注：在浏览器的展示中，函数的参数可能并不是放在arguments对象中，
+    				   //这里为了方便理解，我做了这样的处理
     foo: <foo reference>  // 表示foo的地址引用
     a: undefined
 }
