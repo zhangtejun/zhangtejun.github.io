@@ -5,11 +5,10 @@ date:   2017-05-23 16:44:43
 author: zhangtejun
 categories: zhangtejun
 ---
-# JavaScript深入之变量对象
+# JavaScript之变量对象
 
 ## 前言
 
-在上篇[《JavaScript深入之执行上下文栈》](https://github.com/mqyqingfeng/Blog/issues/4)中讲到，当 JavaScript 代码执行一段可执行代码(executable code)时，会创建对应的执行上下文(execution context)。
 
 对于每个执行上下文，都有三个重要属性：
 
@@ -21,7 +20,91 @@ categories: zhangtejun
 
 ## 变量对象
 
+JavaScript的执行上下文生成之后，会创建一个叫做变量对象的特殊对象，JavaScript的基础数据类型往往都会保存在变量对象中。
 变量对象是与执行上下文相关的数据作用域，存储了在上下文中定义的变量和函数声明。
+```js
+var a1 = 0;   // 变量对象
+var a2 = 'this is string'; // 变量对象
+var a3 = null; // 变量对象
+ 
+var b = { m: 20 }; // 变量b存在于变量对象中，{m: 20} 作为对象存在于堆内存中
+var c = [1, 2, 3]; // 变量c存在于变量对象中，[1, 2, 3] 作为对象存在于堆内存中
+```
+##### 变量对象和对内存
+![变量对象和对内存]({{ site.prototype7 | prepend: site.baseurl }})
+
+我们已经知道，当调用一个函数时（激活），一个新的执行上下文就会被创建。而一个执行上下文的生命周期可以分为两个阶段。
+
+##### 创建阶段
+在这个阶段中，执行上下文会分别创建变量对象，建立作用域链，以及确定this的指向。
+##### 代码执行阶段
+创建完成之后，就会开始执行代码，这个时候，会完成变量赋值，函数引用，以及执行其他代码。
+
+##### 变量对象的创建，依次经历了以下几个过程
+1. 建立`arguments`对象。检查当前上下文中的参数，建立该对象下的属性与属性值。
+2. 检查当前上下文的函数声明，也就是使用`function`关键字声明的函数。在变量对象中以函数名建立一个属性，属性值为指向该函数所在内存地址的引用。如果函数名的属性已经存在，那么该属性将会被新的引用所覆盖。
+3. 检查当前上下文中的变量声明，每找到一个变量声明，就在变量对象中以变量名建立一个属性，属性值为`undefined`。如果该变量名的属性已经存在，为了防止同名的函数被修改为`undefined`，则会直接跳过，原属性值不会被修改。
+
+```
+// demo01
+function test() {
+    console.log(a);
+    console.log(foo());
+ 
+    var a = 1;
+    function foo() {
+        return 2;
+    }
+}
+ 
+test();
+```
+在上例中，我们直接从test()的执行上下文开始理解。全局作用域中运行test()时，test()的执行上下文开始创建。为了便于理解，我们用如下的形式来表示
+
+创建过程
+```
+testEC = {
+    // 变量对象
+    VO: {},
+    scopeChain: {},
+    this: {}
+}
+```
+```
+// VO 为 Variable Object的缩写，即变量对象
+VO = {
+    arguments: {...},  //注：在浏览器的展示中，函数的参数可能并不是放在arguments对象中，这里为了方便理解，我做了这样的处理
+    foo: <foo reference>  // 表示foo的地址引用
+    a: undefined
+}
+```
+未进入执行阶段之前，变量对象中的属性都不能访问！但是进入执行阶段之后，变量对象转变为了活动对象，里面的属性都能被访问了，然后开始进行执行阶段的操作。
+```
+// 执行阶段
+VO ->  AO   // Active Object
+AO = {
+    arguments: {...},
+    foo: <foo reference>,
+    a: 1
+}
+```
+变量对象和活动对象有什么区别？##### 其实都是同一个对象，只是处于执行上下文的不同生命周期
+
+因此，上面的例子，执行顺序就变成了这样
+```
+function test() {
+    function foo() {
+        return 2;
+    }
+    var a;
+    console.log(a);
+    console.log(foo());
+    a = 1;
+}
+
+test();
+```
+##### // 这里有一个需要注意的地方，因为var声明的变量当遇到同名的属性时，会跳过而不会覆盖.
 
 因为不同执行上下文下的变量对象稍有不同，所以我们来聊聊全局上下文下的变量对象和函数上下文下的变量对象。
 
@@ -227,18 +310,3 @@ var foo = 1;
 
 这是因为在进入执行上下文时，首先会处理函数声明，其次会处理变量声明，如果如果变量名称跟已经声明的形式参数或函数相同，则变量声明不会干扰已经存在的这类属性。
 
-## 下一篇文章
-
-[《JavaScript深入之作用域链》](https://github.com/mqyqingfeng/Blog/issues/6)
-
-## 本文相关链接
-
-[《JavaScript深入之执行上下文栈》](https://github.com/mqyqingfeng/Blog/issues/4)
-
-## 深入系列
-
-JavaScript深入系列目录地址：[https://github.com/mqyqingfeng/Blog](https://github.com/mqyqingfeng/Blog)。
-
-JavaScript深入系列预计写十五篇左右，旨在帮大家捋顺JavaScript底层知识，重点讲解如原型、作用域、执行上下文、变量对象、this、闭包、按值传递、call、apply、bind、new、继承等难点概念。
-
-如果有错误或者不严谨的地方，请务必给予指正，十分感谢。如果喜欢或者有所启发，欢迎star，对作者也是一种鼓励。
