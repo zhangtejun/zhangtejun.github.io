@@ -5,6 +5,8 @@ date:   2017-05-23 10:53:16
 author: zhangtj
 categories: zhangtj
 ---
+[Ecma-262.pdf](http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-262.pdf)
+
 内存空间详细图解
 <pre
 <code class="java" style="display:none"
