@@ -18,7 +18,7 @@ categories: zhangtejun
 //check 返回false将会阻止表单提交
 document.forms[0].onsubmit = check;
 ```
-[HTML 事件属性](http://www.w3school.com.cn/tags/html_ref_eventattributes.asp)
+[HTML 事件属性 w3school参考](http://www.w3school.com.cn/tags/html_ref_eventattributes.asp)
 
 ##### 使用返回值改变属性默认行为
 1. 事件处理函数返回值方式
@@ -117,6 +117,7 @@ document.getElementById("bt1").onclick = clickHandler;
 
 ##### 事件传播
 调用事件对象的stopPropagation()方法以阻止事件的继续传播。
+
 event.stopPropagation():阻止event事件传播。
 
 event.preventDefault():取消event事件的默认行为。
