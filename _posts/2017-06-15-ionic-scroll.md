@@ -1,13 +1,13 @@
 ---
 layout: post
-title:  "js时间"
+title:  "js事件"
 date:   2017-06-17 09:12:45
 author: zhangtejun
 categories: zhangtejun
 ---
 ##### js表单校验
 1. 表单元素直接绑定事件处理函数
-```html
+```
 //check 返回false将会阻止表单提交
 <form onsubmit="return check(this)"><form>
 ```
@@ -20,7 +20,7 @@ document.forms[0].onsubmit = check;
 
 ##### 使用返回值改变属性默认行为
 1. 事件处理函数返回值方式
-```html
+```
 //阻止超链接导航
 <a href ="http://www.baidu.com" onclick="return false" />
 ```
