@@ -7,11 +7,13 @@ categories: zhangtejun
 ---
 ##### js表单校验
 1. 表单元素直接绑定事件处理函数
+
 ```js
 //check 返回false将会阻止表单提交
 <form onsubmit="return check(this)"></form>
 ```
 2. 绑定DOM对象属性来设置事件处理函数
+
 ```js
 //check 返回false将会阻止表单提交
 document.forms[0].onsubmit = check;
@@ -20,11 +22,13 @@ document.forms[0].onsubmit = check;
 
 ##### 使用返回值改变属性默认行为
 1. 事件处理函数返回值方式
+
 ```js
 //阻止超链接导航
 <a href ="http://www.baidu.com" onclick="return false" />
 ```
 2. 事件对象的returnValue属性设置为false
+
 ```js
 <script>
 function clickHandler(){
