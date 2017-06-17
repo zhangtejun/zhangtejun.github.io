@@ -7,7 +7,7 @@ categories: zhangtejun
 ---
 ##### js表单校验
 1. 表单元素直接绑定事件处理函数
-```
+```js
 //check 返回false将会阻止表单提交
 <form onsubmit="return check(this)"></form>
 ```
@@ -20,12 +20,12 @@ document.forms[0].onsubmit = check;
 
 ##### 使用返回值改变属性默认行为
 1. 事件处理函数返回值方式
-```
+```js
 //阻止超链接导航
 <a href ="http://www.baidu.com" onclick="return false" />
 ```
 2. 事件对象的returnValue属性设置为false
-```
+```js
 <script>
 function clickHandler(){
 //doSomething
@@ -43,7 +43,7 @@ event.returnValue = fasle;
 <script/>
 ```
 ##### IE
-```
+```js
 /**
 * eventName:事件名，functionReference:函数引用
 **/
@@ -55,7 +55,7 @@ domObj.detachEvent("eventName", functionReference);
 
 ##### 事件冒泡
 IE中事件的传递方向是从事件发生的对象开始，即从下先上传递，因而称为冒泡。
-```
+```js
 //event事件对象. 执行顺序showMsg2()--->showMsg()
 <div onclick="showMsg(this,event)" id="outSide">
 	<div onclick="showMsg2(this,event)" id="inSide" ></div>
@@ -69,7 +69,7 @@ function showMsg(obj,e)
 ```
 
 阻止事件冒泡，可以修改event的cancelBubble属性，默认为false.
-```
+```js
 //仅执行showMsg2()
 <div onclick="showMsg(this,event)" id="outSide">
 	<div onclick="showMsg2(this,event);event.cancelBubble=true" id="inSide" ></div>
