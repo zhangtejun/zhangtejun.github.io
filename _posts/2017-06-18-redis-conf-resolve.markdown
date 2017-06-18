@@ -13,7 +13,7 @@ categories: zhangtejun
 
 2. INCLUDES包含
 
-   和Struts2配置文件类似，可以通过includes包含，redis.conf可以作为总闸，可以包含其他conf文件
+   和Struts2配置文件类似，可以通过includes包含，redis.conf可以作为总闸，可以包含其他conf文件。
 
 3. GENERAL通用
 
