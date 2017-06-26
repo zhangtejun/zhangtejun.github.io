@@ -8,8 +8,7 @@ categories: zhangtj
 [Ecma-262.pdf](http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-262.pdf)
 
 内存空间详细图解
-<pre
-<code class="java" style="display:none"
+```java
 public class HelloWorld {
     /
     * 输出一行字符串“Hello World!”
@@ -19,8 +18,7 @@ public class HelloWorld {
          System.out.println("Hello World!");
     }
 }
-</code
-</pre
+```
 
 变量对象与堆内存
 var a = 20;
@@ -70,8 +68,7 @@ var d = { m: 20 }
 
 要简单理解栈的存取方式，我们可以通过类比乒乓球盒子来分析。如下图左侧。
 
-![IMG\_256](media/image1.jpeg){width="0.3333333333333333in"
-height="0.3333333333333333in"}
+![IMG\_256](media/image1.jpeg)
 
 乒乓球盒子与栈类比
 
@@ -109,8 +106,7 @@ var b = { m: 20 }; *// 变量b存在于变量对象中，{m: 20}
 var c = \[1, 2, 3\]; *// 变量c存在于变量对象中，\[1, 2, 3\]
 作为对象存在于堆内存中*
 
-![IMG\_257](media/image2.jpeg){width="0.3333333333333333in"
-height="0.3333333333333333in"}
+![IMG\_257](media/image2.jpeg)
 
 上例图解
 
