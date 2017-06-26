@@ -25,19 +25,19 @@ Java语言解释器会忽略这些注解，而由第三方工具负责对注解�
  * 
  * 2. 元注解
  * 	@Target 标识这个注解的作用域.
- * 			ElementType.METHOD : 这个注解的作用域的列表，METHOD是方法声明，除此之外，还有：
+ *          ElementType.METHOD : 这个注解的作用域的列表，METHOD是方法声明，除此之外，还有：
  *          ElementType.CONSTRUCTOR（构造方法声明）
  *          ElementType.FIELD（字段声明）
  *          ElementType.ANNOTATION_TYPE(annotation)
  *          ElementType.LOCAL_VARIABLE（局部变量声明）
- * 			ElementType.PACKAGE（包声明）
- * 			ElementType.PARAMETER（参数声明）
- * 			ElementType.TYPE（类接口）
+ *          ElementType.PACKAGE（包声明）
+ *          ElementType.PARAMETER（参数声明）
+ *          ElementType.TYPE（类接口）
  * 3. 生命周期
  * @Retention 声明注解的保留期限,即它的生命周期。
- * 			  RUNTIME就是在运行时存在，可以通过反射读取。除此之外，还有:
- * 			  SOURCE（只在源码显示，编译时丢弃）
- * 			  CLASS（编译时记录到class中，运行时忽略）
+ * 		RUNTIME就是在运行时存在，可以通过反射读取。除此之外，还有:
+ * 		SOURCE（只在源码显示，编译时丢弃）
+ * 		CLASS（编译时记录到class中，运行时忽略）
  * 4. 标识
  * @Inherited 是一个标识性的元注解，它允许子注解继承它。阐述了某个被标注的类型是被继承的。
  * 			     如果一个使用了@Inherited修饰的annotation类型被用于一个class，则这个annotation将被用于该class的子类。
