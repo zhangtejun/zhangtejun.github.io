@@ -40,7 +40,7 @@ Java语言解释器会忽略这些注解，而由第三方工具负责对注解�
  * 		CLASS（编译时记录到class中，运行时忽略）
  * 4. 标识
  * @Inherited 是一个标识性的元注解，它允许子注解继承它。阐述了某个被标注的类型是被继承的。
- * 			     如果一个使用了@Inherited修饰的annotation类型被用于一个class，则这个annotation将被用于该class的子类。
+ * 如果一个使用了@Inherited修饰的annotation类型被用于一个class，则这个annotation将被用于该class的子类。
  * 5. 
  * @Documented  生成javadoc时会包含注解。
  *
