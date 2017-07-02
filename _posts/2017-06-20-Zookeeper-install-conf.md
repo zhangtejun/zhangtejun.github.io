@@ -46,14 +46,62 @@ cd Zookeeper
 mkdir log
 mkdir data
 ```
+
 * 启动ZooKeeper
 ```shell
 cd /usr/ZooKeeper/bin
 ./zkServer.sh start
-
-# bin/zkServer.sh stop 停止
+ #bin/zkServer.sh stop 停止
 ```
+
 * Connecting to ZooKeeper
 ```shell
 ./zkCli.sh -server 127.0.0.1:2181
 ```
+
+* From here, you can try a few simple commands to get a feel for this simple command line interface. First, start by issuing the list command, as in ls, yielding:
+
+```shell
+[zkshell: 8] ls /
+[zookeeper]
+```     
+* Next, create a new znode by running create `/zk_test my_data`. This creates a new znode and associates the string "my_data" with the node. You should see:
+
+```
+[zkshell: 9] create /zk_test my_data
+Created /zk_test
+```   
+* Issue another ls / command to see what the directory looks like:
+
+```
+[zkshell: 11] ls /
+[zookeeper, zk_test]
+```
+        
+Notice that the zk_test directory has now been created.
+
+* Next, verify that the data was associated with the znode by running the get command, as in:
+
+```
+[zkshell: 12] get /zk_test
+my_data
+```       
+We can change the data associated with zk_test by issuing the set command, as in:
+```
+[zkshell: 14] set /zk_test junk
+`
+[zkshell: 15] get /zk_test
+junk
+```
+   
+(Notice we did a get after setting the data and it did, indeed, change.
+
+* Finally, let's delete the node by issuing:
+
+```
+[zkshell: 16] delete /zk_test
+[zkshell: 17] ls /
+[zookeeper]
+[zkshell: 18]
+```
+
