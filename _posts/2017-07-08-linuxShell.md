@@ -52,7 +52,7 @@ root@zhtjun:~/weblogic# ls -li a*
 ```
 可以看见a.txt和a_link.txt的硬链接数为2，再创建一个将为3。而复制的文件为1。
 
-`ls -i或者--inode`查看文件的inode。每一个文件或者目录对应一个inode。
+`ls -i或者\-\-inode`查看文件的inode。每一个文件或者目录对应一个inode。
 a_link.txt或者(a.txt)的内容改变将互相影响。可以简单理解为它们互为硬链接。
 
 ```shell
@@ -126,9 +126,49 @@ chmod命令用来改变文件权限和目录权限，选项为`[ugoa][+-=][rwx-]
 g表示文件所属组（group）,表示除所有者和所属组组员以外的的其他账户（other）,a表示所有账户（all）,
 +,-,=分别表示对权限的增加，减少，定义。
 
-r，w，x，-可以用4，2，1，0来表示。如：0 : ---,1 : --x,7 : rwx等
+r，w，x，-可以用4，2，1，0来表示。如：0 : \-\-\-,1 : \-\-x,7 : rwx等
 
 ##### SUID,SGID及粘滞位
 
+**password**修改密码后，文件/etc/shadow会被更新。
+```shell
+zhangtejun@zhangtejun-pc:~$ ls -l /etc/shadow
+-rw-r----- 1 root shadow 1116 2月  15 10:54 /etc/shadow
+```
+从表面上看仅root才有权限修改次文件。然而其他账户是如何更新次文件？
 
+```shell
+#查看可执行文件password
+root@zhtjun:/usr/bin# which passwd 
+/usr/bin/passwd
+root@zhtjun:/usr/bin# ls -l /usr/bin/passwd 
+-rwsr-xr-x 1 root root 51096 May 26  2012 /usr/bin/passwd
+```
+上面的s就是SUID,SUID是set uid的缩写。SUID仅对可执行二进制文件起作用。
 
+SUID的作用：其他账户在执行时具有文件所有者的权限。chmod u+s sh.sh
+
+简单理解：执行password命令就是执行/usr/bin/passwd，而/usr/bin/passwd有SUID属性并且所有者是root,那么其他账户执行password
+时，就临时具有和root账户一样的权限，将加密后的密码写入文件/etc/shadow。
+
+```shell
+root@zhtjun:/usr/bin# ls -l |grep '^...s'
+-rwsr-sr-x 1 daemon daemon    55456 Oct  3  2014 at
+-rwsr-xr-x 1 root   root      46264 May 26  2012 chfn
+-rwsr-xr-x 1 root   root      41272 May 26  2012 chsh
+-rwsr-xr-x 1 root   root      68024 May 26  2012 gpasswd
+-rwsr-xr-x 1 root   root      36432 May 26  2012 newgrp
+-rwsr-xr-x 1 root   root      51096 May 26  2012 passwd
+-rwsr-sr-x 1 root   mail      89280 Sep  4  2014 procmail
+-rwsr-xr-x 2 root   root     113048 Mar  1  2013 sudo
+-rwsr-xr-x 2 root   root     113048 Mar  1  2013 sudoedit
+-rwsr-sr-x 1 root   root      14264 May  7  2013 X
+```
+
+SGID是set gid的缩写。即其他账户执行时具有文件所属组的权限。
+
+设置SGID和SUID属性时需要确保目录或文件对于所属组有执行权限。如果没有会看见大写的S。这是不正常的。需要增加相应权限就正常。
+
+**粘滞位**也就SBIT，是sticky bit的缩写。只有目录才可以设置该属性。可以理解为防删除位。
+作用是：在一个大家都具有权限的目录下，某个账号不能随便删除别人的文件或目录。
+增加SBIT属性：chmod o+t folder
