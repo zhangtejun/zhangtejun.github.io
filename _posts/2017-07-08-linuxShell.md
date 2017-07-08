@@ -7,7 +7,7 @@ categories: zhangtejun
 ---
 ##### 创建符号链接(软链接)和硬链接命令 ln
 windows下有快捷方式，linux下对应的是符号链接(symbolic links),建立符号链接格式为：
-`ln -s 目标文件(源文件) 链接文件` -s或--symbolic是必选的。
+`ln -s 目标文件(源文件) 链接文件` -s或\-\-symbolic是必选的。
 例：建立一个名为sym_a.txt,目标文件为a.txt的符号链接。
 ```shell
 root@zhtjun:~/weblogic# ln -s a.txt sym_a.txt
