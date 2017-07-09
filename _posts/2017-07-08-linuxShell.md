@@ -221,5 +221,4 @@ root@zhtjun:~/weblogic# cat info.txt
 -rw-r--r-- 1 root root 0 Jul  8 22:31 test.txt
 ```
 ![常用重定向命令]({{ site.prototype8 | prepend: site.baseurl }})
-![常用重定向命令]({{ site.823762316 | prepend: site.baseurl }})
 
