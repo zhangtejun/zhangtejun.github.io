@@ -305,6 +305,7 @@ root@zhtjun:~# mkdir -p /tmp/mail/{a,b,c} #将分别创建abc目录。
 ##### 命令执行结果赋值变量
 * **变量=\`命令\`**(注意是反引号)
 * 变量=$(命令)
+
 ```shell
 zhangtejun@zhangtejun-pc:~$ A=`date`
 zhangtejun@zhangtejun-pc:~$ echo $A
