@@ -273,8 +273,89 @@ root@zhtjun:~# (pwd;ps)
 15238 pts/0    00:00:00 ps
 root@zhtjun:~# 
 ```
+#### 变量和数组
+
+##### 变量定义
+bash无需声明其变量的类型就可以直接赋值。引用变量时需要加美元符号$。定义变量时必须是**字母数字和下划线组和**。
+
+内置命令unset可以清楚变量。`unset 变量名`
+```shell
+zhangtejun@zhangtejun-pc:~$ testa=100
+zhangtejun@zhangtejun-pc:~$ echo $testa 
+100
+zhangtejun@zhangtejun-pc:~$ testb="hello"
+zhangtejun@zhangtejun-pc:~$ echo $testb
+hello
+```
+定义字符串时如果包含空格需要使用引号。*双引号中可以包含变量，而单引号将原封不动输出所有内容。*
+```shell
+zhangtejun@zhangtejun-pc:~$ a=hello world
+bash: world: 未找到命令
+zhangtejun@zhangtejun-pc:~$ a='hello world'
+zhangtejun@zhangtejun-pc:~$ a="hello world"
+zhangtejun@zhangtejun-pc:~$ a=$A_world     #将变量A_world赋值给a
+zhangtejun@zhangtejun-pc:~$ a=${A}_world   #将变量A和_world拼接后赋值给a
+```
+大括号扩展功能：
+```shell
+root@zhtjun:~# echo a{d,c,b{x,y,zz}}e
+root@zhtjun:~# ade ace abxe abye abzze
+root@zhtjun:~# mkdir -p /tmp/mail/{a,b,c} #将分别创建abc目录。
+```
+##### 命令执行结果赋值变量
+* **变量=\`命令\`**(注意是反引号)
+* 变量=$(命令)
+```shell
+zhangtejun@zhangtejun-pc:~$ A=`date`
+zhangtejun@zhangtejun-pc:~$ echo $A
+2017年 07月 09日 星期日 12:12:17 CST
+zhangtejun@zhangtejun-pc:~$ B=$(date)
+zhangtejun@zhangtejun-pc:~$ echo $B
+2017年 07月 09日 星期日 12:12:29 CST
+```
+Bash的特殊变量
+
+|    变量             |        含义           |
+| ------------- |:-------------:|
+| $0      | 当前脚本的文件名 |
+| $N      | 传递给脚本或函数的参数$1,$2...${10}。N大于9时需要用括号括起来 |
+| $#      | 传递给脚本或函数的参数个数 |
+| $*      | 传递给脚本或函数的所有参数。(一起作为一个字符串) |
+| $@      | 传递给脚本或函数的所有参数。(分别作为一个字符串) |
+| $?      | 上个命令的退出状态值 |
+| $$      | 当前脚本的文件名 |
+| $$      | 当前Shell进程ID。对于 Shell 脚本，就是这些脚本所在的进程ID。|
+| $!      | 最后一个后台命令的进程ID|
+| $-      | 当前shell的选项 |
+| $_      | 上一条命令的最后一个参数 |
 
 
+##### 字符串操作
 
+|    表达式             |        含义           |
+| ------------- |:-------------:|
+| ${#str}      | 字符串str的长度 |
+| ${str:position}      | 从字符串str中位置position开始提取子字符串 |
+| ${str:position:length}      | 从字符串str中位置position开始提取长度为length的子字符串|
+| ${str#regexp}      | 从变量str的开头，删除最短匹配regexp的子串 |
+| ${str##regexp}     | 从变量str的开头，删除最长匹配regexp的子串 |
+| ${str%regexp}      | 从变量str的结尾，删除最短匹配regexp的子串 |
+| ${str%%regexp}     | 从变量str的结尾，删除最长匹配regexp的子串 |
+| ${str/regexp/replacement}      | 使用replacement，来替换第一个匹配的regexp |
+| ${str//regexp/replacement}      | 使用replacement，来替换所有匹配的regexp |
+| ${str/#regexp/replacement}      | 如果str的前缀匹配regexp， 使用replacement，来替换所有的regexp |
+| ${str/%regexp/replacement}      | 如果str的后缀匹配regexp， 使用replacement，来替换所有的regexp|
+
+##### expr处理字符串
+
+|    命令             |        含义           |
+| ------------- |:-------------:|
+| expr length str      | 字符串str的长度 |
+| expr index str  char    | 计算字符char在字符串str中首次出现的位置,没有找到返回0 |
+| expr substr  pos str      | 从字符串str中位置pos开始提取长度为length的子字符串|
+| expr match str   regexp   | 字符串str开头的匹配regexp的长度 |
+| expr str :regexp      | 字符串str开头的匹配regexp的长度 |
+| expr match str   :\\(regexp\\)     | 从字符串str开头位置提取regexp |
+| expr str   :\\(regexp\\)     | 从字符串str开头位置提取regexp |
 
 
