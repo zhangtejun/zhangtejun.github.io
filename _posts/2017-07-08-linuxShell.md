@@ -226,18 +226,18 @@ root@zhtjun:~/weblogic# cat info.txt
 | ------------- |:-------------:|
 | command > file     | 标准输出重定向到文件 |
 | command 1> file      | 同上      | 
-| command >> file | 标准输出追加重定向到文件     |
+| command \>\> file | 标准输出追加重定向到文件     |
 | command 2> file | 标准错误重定向到文件     |
 | command > file 2> file2 | 标准输出重定向到文件file,标准错误重定向到文件file2     |
 | command > file 2>&1 | 标准输出和标准错误同时重定向到文件     |
 | command &> file | 同上     |
 | command >& file | 同上     |
-| command >> file 2>&1| 标准输出和标准错误同时追加重定向到文件     |
-| command &>> file| 标准输出和标准错误同时追加重定向到文件 ,bash4支持  |
+| command \>\> file 2>&1| 标准输出和标准错误同时追加重定向到文件     |
+| command &\>\> file| 标准输出和标准错误同时追加重定向到文件 ,bash4支持  |
 | command < file| 命令以文件作为标准输入     |
 | command < file > file2| 以file作为命令的输入，标准输出重定向到file2     |
 | command \|tee file| 命令的结果显示在终端，结果同时写入文件file     |
-| command \|& command2\| command的标准输出和标准错误以管道传给command2,bash4支持，等价于  command 2>&1 \| command2   |
+| command \|& command2| command的标准输出和标准错误以管道传给command2,bash4支持，等价于  command 2>&1 \| command2   |
 
 ##### 命令后台执行 &
 ```shell
