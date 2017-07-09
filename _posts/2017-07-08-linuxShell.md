@@ -52,7 +52,7 @@ root@zhtjun:~/weblogic# ls -li a*
 ```
 可以看见a.txt和a_link.txt的硬链接数为2，再创建一个将为3。而复制的文件为1。
 
-`ls -i或者\-\-inode`查看文件的inode。每一个文件或者目录对应一个inode。
+`ls -i或者--inode`查看文件的inode。每一个文件或者目录对应一个inode。
 a_link.txt或者(a.txt)的内容改变将互相影响。可以简单理解为它们互为硬链接。
 
 ```shell
@@ -172,3 +172,52 @@ SGID是set gid的缩写。即其他账户执行时具有文件所属组的权限
 **粘滞位**也就SBIT，是sticky bit的缩写。只有目录才可以设置该属性。可以理解为防删除位。
 作用是：在一个大家都具有权限的目录下，某个账号不能随便删除别人的文件或目录。
 增加SBIT属性：chmod o+t folder
+
+##### alias,unalias
+设置别名：`alias 别名=值`
+
+列出当前所有别名：`alias`或者`alias -p`
+
+##### 修改.bashrc
+以Ubuntu系统为例，/etc/environment,/etc/profile,/etc/bash.bashrc三个文件控制着整个系统的环境设置。而每个用户主目录下的.bashrc
+的修改只影响用户自己的环境。
+
+##### source命令和点命令
+内置source命令和点命令都可以使修改马上生效。
+
+#### 命令的解释顺序和改变解释顺序的3个内置命令
+Bash解释顺序：alias-->keyword-->function-->built in-->$PATH
+即别名，关键字，函数，内置命令，外部命令。
+
+改变解释顺序的3个内置命令
+* commoand <命令> 忽略函数和别名，按内置和外部命令来处理。
+* builtin<命令> 只查找内置命令。
+* enable 禁止或使能内置命令。enable -n禁止，不带参数使能
+
+##### 标准错误输出
+执行一个shell命令会自动打开标准错误输出文件（stderr）,默认对应终端屏幕，对应文件描述符为2。
+```shell
+root@zhtjun:~# ls -l test.txt
+ls: cannot access test.txt: No such file or directory
+#No such file or directory 不是标准输出而是标准错误
+
+#使用2>对标准错误输出重定向，2>>追加重定向。注意2和>间不能有空格。
+
+#对2类输出信息分别重定向到不同文件标准输出到a.txt,标准错误输出到b.txt。1>中的1可以省略。
+ls -l test.txt 1>a.txt 2>b.txt
+#2>&1将标准错误输出重定向到标准输出
+ls -l test.txt 1>a.txt 2>&1
+#&>和>&可以将标准错误和标准输出重定向到同一个文件。通常情况下标准错误输出到设备文件/dev/null
+ls -l test.txt &>a.txt
+```
+##### 同时把结果输出到标准输出和文件 tee
+文件描述符0，1，2分别对应标准输入，标准输出，标准错误。
+```shell
+root@zhtjun:~/weblogic# ls -l test.txt | tee info.txt
+-rw-r--r-- 1 root root 0 Jul  8 22:31 test.txt
+#如果info.txt有内容将被覆盖。追加内容为：tee -a/--append info.txt 
+#tee - 文件用‘-’代替将输出到屏幕
+root@zhtjun:~/weblogic# cat info.txt 
+-rw-r--r-- 1 root root 0 Jul  8 22:31 test.txt
+```
+![常用重定向命令]({{ site.prototype8 | prepend: site.baseurl }})
