@@ -221,6 +221,7 @@ root@zhtjun:~/weblogic# cat info.txt
 -rw-r--r-- 1 root root 0 Jul  8 22:31 test.txt
 ```
 常用重定向命令
+
 |    命令格式             |        含义           |
 | ------------- |:-------------:|
 | command>file     | 标准输出重定向到文件 |
