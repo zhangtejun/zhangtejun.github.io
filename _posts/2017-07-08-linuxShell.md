@@ -314,7 +314,9 @@ zhangtejun@zhangtejun-pc:~$ B=$(date)
 zhangtejun@zhangtejun-pc:~$ echo $B
 2017年 07月 09日 星期日 12:12:29 CST
 ```
-Bash的特殊变量
+
+
+##### Bash的特殊变量
 
 |    变量             |        含义           |
 | ------ |:----------------------------------:|
