@@ -224,6 +224,57 @@ root@zhtjun:~/weblogic# cat info.txt
 
 |    命令格式             |        含义           |
 | ------------- |:-------------:|
-| command>file     | 标准输出重定向到文件 |
-| col 2 is      | centered      | 
-| zebra stripes | are neat      |
+| command > file     | 标准输出重定向到文件 |
+| command 1> file      | 同上      | 
+| command >> file | 标准输出追加重定向到文件     |
+| command 2> file | 标准错误重定向到文件     |
+| command > file 2> file2 | 标准输出重定向到文件file,标准错误重定向到文件file2     |
+| command > file 2>&1 | 标准输出和标准错误同时重定向到文件     |
+| command &> file | 同上     |
+| command >& file | 同上     |
+| command >> file 2>&1| 标准输出和标准错误同时追加重定向到文件     |
+| command &>> file| 标准输出和标准错误同时追加重定向到文件 ,bash4支持  |
+| command < file| 命令以文件作为标准输入     |
+| command < file > file2| 以file作为命令的输入，标准输出重定向到file2     |
+| command |tee file| 命令的结果显示在终端，结果同时写入文件file     |
+| command |& command2| command的标准输出和标准错误以管道传给command2,bash4支持，等价于  command 2>&1 | command2   |
+
+##### 命令后台执行 &
+```shell
+cp -r dir1 dir2 &
+[1] 6090
+```
+第一个是工作号也叫作业号1，6090为进程号。
+
+windows下文件的换行符是`\r\n`，linux下换行符是`\n`。
+
+##### 大括号和小括号中的命令
+一条命令或多条命令可以放在大括号或小括号里执行。在小括号时，命令在一个子shell执行。大括号在当前shell里执行。
+```shell
+root@zhtjun:~# pwd
+/root
+root@zhtjun:~# (cd /tmp)
+root@zhtjun:~# 
+```
+
+##### 子shell
+子shell和父shell有各自的进程号，
+```shell
+root@zhtjun:~# pwd;ps
+/root
+  PID TTY          TIME CMD
+14522 pts/0    00:00:00 bash #当前shell的进程id
+15225 pts/0    00:00:00 ps   #命令ps的进程id
+root@zhtjun:~# (pwd;ps)
+/root
+  PID TTY          TIME CMD
+14522 pts/0    00:00:00 bash #当前父shell的进程id，为改变
+15237 pts/0    00:00:00 bash #当前子shell的进程id
+15238 pts/0    00:00:00 ps
+root@zhtjun:~# 
+```
+
+
+
+
+
