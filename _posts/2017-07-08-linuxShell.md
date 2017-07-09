@@ -236,8 +236,8 @@ root@zhtjun:~/weblogic# cat info.txt
 | command &>> file| 标准输出和标准错误同时追加重定向到文件 ,bash4支持  |
 | command < file| 命令以文件作为标准输入     |
 | command < file > file2| 以file作为命令的输入，标准输出重定向到file2     |
-| command |tee file| 命令的结果显示在终端，结果同时写入文件file     |
-| command |& command2| command的标准输出和标准错误以管道传给command2,bash4支持，等价于  command 2>&1 | command2   |
+| command \|tee file| 命令的结果显示在终端，结果同时写入文件file     |
+| command \|& command2\| command的标准输出和标准错误以管道传给command2,bash4支持，等价于  command 2>&1 \| command2   |
 
 ##### 命令后台执行 &
 ```shell
