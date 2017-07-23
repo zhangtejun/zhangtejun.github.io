@@ -650,6 +650,9 @@ root@zhtjun:~#  cat Linux.txt | sed -n '/Linux/i\\Good' L2.txt
 |w|将所选文本写入文件|
 
 ##### 一行多命令和保存匹配&
+```shell
+
+```
 
 
 
