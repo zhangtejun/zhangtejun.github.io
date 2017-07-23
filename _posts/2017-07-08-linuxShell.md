@@ -650,8 +650,19 @@ root@zhtjun:~#  cat Linux.txt | sed -n '/Linux/i\Good' L2.txt
 |w|将所选文本写入文件|
 
 ##### 一行多命令和保存匹配&
-```shell
 
+```shell
+#将Linux的Jack替换为Rose,并且将包含interest的行删除
+root@zhtjun:~#  sed -e 's/Jack/Rose/' -e '/interest/d' Linux.txt
+root@zhtjun:~#  sed 's/Jack/Rose/;/interest/d' Linux.txt
+#s/[a-z]^u&/g小写转大写，将[a-z]将的字符，\u的作用是转大写，&保存已匹配的字符（串）以便调用它
+root@zhtjun:~#  sed 's/Jack/Rose/;/interest/d' Linux.txt;s/[a-z]/\u&/g' Linux.txt 
+
+#保存匹配&
+root@zhtjun:~# echo Jack | sed 's/Jack/Hello/'
+Hello
+root@zhtjun:~# echo Jack | sed 's/Jack/Hello &/'
+Hello Jack
 ```
 
 
