@@ -576,3 +576,79 @@ root@zhtjun:~# sort   linux.txt  -o linux.txt
 
 
 ##### sed 流编辑器
+```shell
+#替换命令s/regexp/replacement/，把linux.txt中的linux替换为LINUX。
+#替换命令s/regexp/replacement/flags。flags为g表示全局替换，为数值3时代表替换第3个匹配，gi忽略大小替换
+root@zhtjun:~# sed 's/Linux/LINUX/g'linux.txt
+
+
+#替换命令s/regexp/replacement/，把linux.txt中的linux替换为LINUX
+root@zhtjun:~# sed 's/Linux/LINUX/'linux.txt
+
+
+#每行前2个替换为A
+root@zhtjun:~# sed 's/^../A/'linux.txt
+
+#删除每行前2个字符
+root@zhtjun:~# sed 's/^..//'linux.txt
+
+#将文件每行的第一个空格到行尾替换为B,注意：/ .间有个空格
+root@zhtjun:~# sed 's/ .*$/B/'linux.txt
+
+#注释掉5到7行
+root@zhtjun:~# sed '5,7s/^/#/'linux.txt
+
+#使用-r/--regexp-extended时，sed支持扩展正则表达式
+root@zhtjun:~# echo 'morning#afternoon'>qq #存入文件qq
+#.+代表一个或多个字符，\\1和\\2分别代表第1个括号和第二个括号里的匹配。\\t代表<tab>键。
+#如果需要保存至文件，可以使用重定向或者-i选项，sed -i -r 's/(.+)#(.+)/\\2\\t\\1/' qq 
+#sed -i_bak -r 's/(.+)#(.+)/\\2\\t\\1/' qq ,备份文件为qq_bak为原内容。
+root@zhtjun:~# sed -r 's/(.+)#(.+)/\\2\\t\\1/' qq 
+morning		afternoon'
+
+#原封不动的输出内容,相当于cat Linux.txt
+root@zhtjun:~# sed '' Linux.txt
+
+#原封不动的输出内容,相当于cat Linux.txt,-n的作用是取消默认输出
+root@zhtjun:~# sed '' Linux.txt
+
+#显示文件前2行,没有-n的话，前2行将输出2次，一次为命令p的输出，一次是默认输出。
+root@zhtjun:~# sed -n '1,2p' Linux.txt
+
+#显示文件第一行,显示文件第三行到尾行，sed -n '3,$p' Linux.txt
+root@zhtjun:~# sed -n '1p' Linux.txt
+
+#显示文件中包含Linux的行，
+root@zhtjun:~# sed -n '/Linux/p' Linux.txt
+
+#删除文件前2行，
+root@zhtjun:~# sed -n '1,2d' Linux.txt
+
+#删除包含linux的行，
+root@zhtjun:~# sed -n '/Linux/d' Linux.txt
+
+
+#将文件中包含Linux的行，存入L2.txt
+root@zhtjun:~#  cat Linux.txt | sed -n '/Linux/w' L2.txt
+
+#将文件中包含Linux的行前，插入内容Good
+root@zhtjun:~#  cat Linux.txt | sed -n '/Linux/i\\Good' L2.txt
+
+```
+
+|    命令             |        含义           |
+|:-------------:|:-------------|
+|a\\     | 在当前行之后添加一行或者多行，多行时除最后一行外，每行末尾需要需加续行符\\ |
+|c\\|用新文本替换当前行中的文本，多行时除最后一行外，每行末尾需要需加续行符\\|
+|d|删除文本|
+|i\\|在当前行之前插入文本，多行时除最后一行外，每行末尾需要需加续行符\\|
+|l|显示不可打印字符|
+|p|打印文本|
+|r|从文件中读取输入行|
+|s|匹配查找或替换|
+|w|将所选文本写入文件|
+
+
+
+
+
