@@ -600,10 +600,10 @@ root@zhtjun:~# sed '5,7s/^/#/'linux.txt
 
 #使用-r/--regexp-extended时，sed支持扩展正则表达式
 root@zhtjun:~# echo 'morning#afternoon'>qq #存入文件qq
-#.+代表一个或多个字符，\\1和\\2分别代表第1个括号和第二个括号里的匹配。\\t代表<tab>键。
-#如果需要保存至文件，可以使用重定向或者-i选项，sed -i -r 's/(.+)#(.+)/\\2\\t\\1/' qq 
-#sed -i_bak -r 's/(.+)#(.+)/\\2\\t\\1/' qq ,备份文件为qq_bak为原内容。
-root@zhtjun:~# sed -r 's/(.+)#(.+)/\\2\\t\\1/' qq 
+#.+代表一个或多个字符，\1和\2分别代表第1个括号和第二个括号里的匹配。\t代表<tab>键。
+#如果需要保存至文件，可以使用重定向或者-i选项，sed -i -r 's/(.+)#(.+)/\2\t\1/' qq 
+#sed -i_bak -r 's/(.+)#(.+)/\2\t\1/' qq ,备份文件为qq_bak为原内容。
+root@zhtjun:~# sed -r 's/(.+)#(.+)/\2\t\1/' qq 
 morning		afternoon'
 
 #原封不动的输出内容,相当于cat Linux.txt
@@ -632,7 +632,7 @@ root@zhtjun:~# sed -n '/Linux/d' Linux.txt
 root@zhtjun:~#  cat Linux.txt | sed -n '/Linux/w' L2.txt
 
 #将文件中包含Linux的行前，插入内容Good
-root@zhtjun:~#  cat Linux.txt | sed -n '/Linux/i\\Good' L2.txt
+root@zhtjun:~#  cat Linux.txt | sed -n '/Linux/i\Good' L2.txt
 
 
 ```
@@ -640,10 +640,10 @@ root@zhtjun:~#  cat Linux.txt | sed -n '/Linux/i\\Good' L2.txt
 |    命令             |        含义           |
 |:-------------:|:-------------|
 |a\\     | 在当前行之后添加一行或者多行，多行时除最后一行外，每行末尾需要需加续行符\\ |
-|c\\|用新文本替换当前行中的文本，多行时除最后一行外，每行末尾需要需加续行符\\|
+|c\\     |用新文本替换当前行中的文本，多行时除最后一行外，每行末尾需要需加续行符\\    |
 |d|删除文本|
-|i\\|在当前行之前插入文本，多行时除最后一行外，每行末尾需要需加续行符\\|
-|l|显示不可打印字符|
+|i\\     |在当前行之前插入文本，多行时除最后一行外，每行末尾需要需加续行符\\  |
+|l   |显示不可打印字符    |
 |p|打印文本|
 |r|从文件中读取输入行|
 |s|匹配查找或替换|
