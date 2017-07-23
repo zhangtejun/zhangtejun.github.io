@@ -634,6 +634,7 @@ root@zhtjun:~#  cat Linux.txt | sed -n '/Linux/w' L2.txt
 #将文件中包含Linux的行前，插入内容Good
 root@zhtjun:~#  cat Linux.txt | sed -n '/Linux/i\\Good' L2.txt
 
+
 ```
 
 |    命令             |        含义           |
