@@ -431,3 +431,148 @@ ls [!az]*
 | \w    |匹配字母数字下划线（单词字符）即[A-Za-z0-9_] |
 | \W    |\w的取反 |
 
+```shell
+#grep . 将过滤掉空行，显示所有非空行
+root@zhtjun:~# grep . test.txt
+
+#过滤出包含abc的行,-i或者\-\-ignore-case来忽略大小写。
+root@zhtjun:~# grep abc  test.txt
+
+#过滤出已book结尾的行
+root@zhtjun:~# grep book$  test.txt
+
+#过滤出空行，$匹配行末，^匹配行始，则^$ 匹配空行
+root@zhtjun:~# grep ^$  test.txt
+
+#过滤出非空行，可以用-v,用来取反invert
+root@zhtjun:~# grep -v ^$  test.txt
+
+#匹配包含数字的行
+root@zhtjun:~# grep [0-9]  test.txt
+
+#匹配包含2个连续字母o的行
+root@zhtjun:~# grep 'o\{2\}'  test.txt
+
+#匹配以t开头，e结尾，中间有2个字符的单词的行。任意字符为：'\<t*e\>'
+root@zhtjun:~# grep '\<t..e\>'  test.txt
+
+#匹配包含2个连续字母o的行,-n用来显示匹配的行号，-c或者--count用来匹配次数(行数)，
+root@zhtjun:~# grep -nc 'o\{2\}'  test.txt
+```
+正则表达式中的‘^’和-v都有取反功能，但是具体作用不太一样。
+
+##### 扩展的egrep
+egrep是grep的扩展，支持多元字符。
+```shell
+#[0-9]?表示0个或者1个阿拉伯数字，在字符串abc2ef中包含一个数字，可以用[0-9]?匹配，
+root@zhtjun:~# echo abc2ef | egrep '[0-9]?'
+abc2ef
+
+#grep 无法过滤出
+root@zhtjun:~# echo abc2ef | grep '[0-9]?'
+root@zhtjun:~#
+
+# 'egrep' means 'grep -E'.  'fgrep' means 'grep -F'.
+root@zhtjun:~# echo abcd2ef | grep -E '[0-9]?'
+abcd2ef
+root@zhtjun:~# 
+
+#
+root@zhtjun:~# echo "it readable" | egrep 'read(able|ability)'
+it readable
+
+root@zhtjun:~# echo "it readable" | grep 'read(able|ability)'
+root@zhtjun:~# 
+
+
+```
+
+##### 剪取内容命令cut
+
+```shell
+#显示每一行的第一个字符,显示前3个字符为：-c1-3可以简写为-c-3
+root@zhtjun:~# cut -c1 linux.txt
+
+#显示每一行的第一个字符和第3到第5个字符
+root@zhtjun:~# cut -c1,3-5 linux.txt
+
+#显示每一行的第一个字符和第3到第5个字符和第10个到行尾的字符
+root@zhtjun:~# cut -c1,3-5,10- linux.txt
+
+#文件内容为 aaa bbb ccc ，-f用来指定域（field list）,第一个和第3个域 -f1,3。默认分隔符为<tab>键（\\t）
+root@zhtjun:~# cut -f2 linux.txt
+bbb
+
+#分隔符不是<tab>，可以用-d来指定分隔符
+root@zhtjun:~# cut -d: -f1,7 /etc/passwd
+root:/bin/bash
+daemon:/bin/sh
+bin:/bin/sh
+sys:/bin/sh
+sync:/bin/sync
+games:/bin/sh
+
+```
+
+##### 合并相应行命令paste
+paste和cut作用相反
+
+```shell
+#默认分隔符为<tab>
+root@zhtjun:~# paste linux.txt linux1.txt linux2.txt 
+aaa bbb ccc
+
+#-d指定分隔符
+root@zhtjun:~# paste -d# linux.txt linux1.txt linux2.txt 
+aaa#bbb#ccc
+
+#默认分隔符为<tab>，将所有账户名一行显示
+root@zhtjun:~# cat /etc/passwd | cut -d: -f1 | paste -s
+root    daemon  bin     sys     sync    games   man     lp      mail    news    uucp    proxy   www-data        backup  list    irc     gnats   nobody  libuuid Debian-exim     statd   sshd    ubuntu  messagebus saned   weblogic        mysql
+
+#指定分隔符为空格
+root@zhtjun:~# cat /etc/passwd | cut -d: -f1 | paste -d' ' -s
+root daemon bin sys sync games man lp mail news uucp proxy www-data backup list irc gnats nobody libuuid Debian-exim statd sshd ubuntu messagebus saned weblogic mysql
+```
+##### 转换或删除命令tr
+
+```shell
+#将linux.txt中的所有字符i替换为x。将小写替换为大小 tr [a-z] [A-Z]<Linux.txt 
+root@zhtjun:~# tr i x<Linux.txt
+
+#大小写转换还可以用[:upper:]和[:lower:]
+root@zhtjun:~# cat linux.txt | tr [:upper:] [:lower:]
+
+#-s用来压缩重复字符
+
+#-d用来删除字符， 如：去空格 tr -d' '
+
+```
+
+##### 排序sort
+
+```shell
+#默认升序排列，-v/--reverse来倒序排序
+root@zhtjun:~# cat /etc/passwd | cut -d: -f1 |sort
+
+#-u 去掉重复行
+root@zhtjun:~# cat /etc/passwd | cut -d: -f1 |sort -u
+
+#-R 随机排序
+root@zhtjun:~# cat /etc/passwd | cut -d: -f1 |sort -R
+
+#对应数值文件内容排序，-n按照数值大小排序
+root@zhtjun:~# cat /etc/passwd | cut -d: -f1 |sort -n
+
+#按指定域排序,数值域
+root@zhtjun:~# sort -k 2 -n linux.txt
+
+#按指定域排序,非数值域，第3列，默认分隔符为<tab>
+root@zhtjun:~# sort -k 3  linux.txt
+
+#-o指定输出存放的文件名，可以和当前文件重名
+root@zhtjun:~# sort   linux.txt  -o linux.txt 
+```
+
+
+##### sed 流编辑器
