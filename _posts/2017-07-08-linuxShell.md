@@ -361,4 +361,63 @@ zhangtejun@zhangtejun-pc:~$ echo $B
 | expr match str   :\\(regexp\\)     | 从字符串str开头位置提取regexp |
 | expr str   :\\(regexp\\)     | 从字符串str开头位置提取regexp |
 
+expr也可以计算表达式
+格式为： expr 表达式
+
+#### 正则表达式
+
+##### 多字符串替换*
+```shell
+root@zhtjun:~/weblogic# ls
+a_copy.txt  a_link.txt  info.txt  test.txt
+# 查看当前目录下所有文件
+root@zhtjun:~/weblogic# cat *
+test
+222
+```
+##### 单字符串？
+```shell
+root@zhtjun:~/weblogic# ls -lh
+total 12K
+-rw-r--r-- 1 root root    0 Jul 15 10:44 a
+-rw-r--r-- 1 root root    5 Jul  8 10:58 a_copy.txt
+-rw-r--r-- 1 root root    4 Jul  8 11:06 a_link.txt
+drwxr-xr-x 2 root root 4.0K Jul 15 10:44 b
+-rw-r--r-- 1 root root    0 Jul  8 22:31 info.txt
+-rw-r--r-- 1 root root    0 Jul  8 22:31 test.txt
+# ?代表一个字符，ls ? 将显示名字为一个字符的文件或文件夹
+# ls ?(n个) 将显示名字为n个字符的文件或文件夹
+# ls x?.* 将显示名字为匹配该参数的文件或文件夹
+root@zhtjun:~/weblogic# ls ?
+a
+
+b:
+```
+##### 范围替换[]与[!]
+单字符串的替换除了用？之外，还可以用中括号。
+```shell
+# [amz]*表示名字以a,或m，或者以z开头的文件名。
+ls [amz]*
+# 匹配名字为小写字母的单字符文件名，ls [a-z][a-z]匹配双字符
+ls [a-z]
+
+# [!az]*表示不以字符a或z开头的文件名。[!a-z]*不以字符a到z开头的文件名
+ls [!az]*
+```
+
+##### 过滤器grep
+命令grep(global search regular expression and print out the line )
+
+|    字符             |        含义           |
+|:-------------:|:-------------|
+|.      | 匹配如何单个字符串 |
+| expr index str  char    | 计算字符char在字符串str中首次出现的位置,没有找到返回0 |
+| expr substr  pos str      | 从字符串str中位置pos开始提取长度为length的子字符串|
+| expr match str   regexp   | 字符串str开头的匹配regexp的长度 |
+| expr str :regexp      | 字符串str开头的匹配regexp的长度 |
+| expr match str   :\\(regexp\\)     | 从字符串str开头位置提取regexp |
+| expr str   :\\(regexp\\)     | 从字符串str开头位置提取regexp |
+
+
+
 
