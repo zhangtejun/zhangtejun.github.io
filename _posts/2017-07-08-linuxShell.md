@@ -659,13 +659,100 @@ root@zhtjun:~#  sed 's/Jack/Rose/;/interest/d' Linux.txt
 root@zhtjun:~#  sed 's/Jack/Rose/;/interest/d' Linux.txt;s/[a-z]/\u&/g' Linux.txt 
 
 #保存匹配&
+#将Jack替换为Hello
 root@zhtjun:~# echo Jack | sed 's/Jack/Hello/'
 Hello
+#在Jack前加Hello（而不用Hello替换），因为&代表已匹配上的Jack
 root@zhtjun:~# echo Jack | sed 's/Jack/Hello &/'
 Hello Jack
 ```
 
+##### sed的退出状态
+grep命令在找到了它所查找的模式时，退出状态为0，若没有找到，推出状态非0。
 
+sed和awk都支持查找模式,但是无论是否查询到，退出状态都为0，当语法错误时，退出状态为非0.
 
+sed可以说是一条交互式的编辑命令，另一方面sed也是一门脚本语言。格式为：sed [选项] -f sed-script 文件名
+,其中sed-script是事先已写好的sed脚本。在一行中可以有多条sed命令，当过长时，sed脚本更方便。
+```
+root@zhtjun:~# cat sed.sh
+#!bin/sed -f
+s/Jack/Rose/
+/interest/d
+#在最后一行的前面加上Yours sincerely。$代表最后一行
+$i\Yours sincerely
+#在最后一行的后面加上Yours sincerely。$代表最后一行
+$a\In BeiJing
+```
+
+#### AWK文本处理工具
+awk的名称来自它的三个创始人，Alfred Aho,Peter Weinberger,Brian Kernighan的姓氏首字母。
+
+格式：awk 'command' fileName
+
+awk对文件进行逐行扫描并处理。
+
+```shell
+#$0代表awk读入的文件的每一行内容。 相当于cat test.txt
+root@zhtjun:~# awk '{print $0}' test.txt
+
+#输出加上序号。awk '{print NR, $1 ,$2}' test.txt    $1代表第1列。 
+# NR（Number of the current Record）为awk内置变量，表示当前记录（当前行）的序号
+root@zhtjun:~# awk '{print NR, $0}' test.txt 
+1 11 22 33
+2 44 55
+3 66
+4 
+5 77 88 99
+
+# 依次读取文件每一行并输出Good。 test文件共5行
+root@zhtjun:~# awk '{print "Good"}' test.txt 
+Good
+Good
+Good
+Good
+Good
+```
+
+##### awk支持正则表达式
+格式： awk '查找模式 [命令]' 文件名
+
+```shell
+#表示第二列匹配88的行
+root@zhtjun:~# awk '$2~88' test.txt
+77 88 99
+
+#取出第1 2 列另存为test.bak文件
+root@zhtjun:~# awk '{print $1 ,$2 >"test.bak"}' test.txt
+```
+
+另一种常用格式： awk [-F 域分隔符]'命令' 文件名
+
+默认分隔符为空格，则可以省略-F。
+```shell
+
+root@zhtjun:~# awk -F: '{print $1 ,$7}' /etc/passwd
+# 实际上-F后面跟得分隔符指的是输入域分隔符，也可以由awk内置变量FS指定；相应的输出分隔符由awk的内置变量OFS指定，默认都是空格。
+root@zhtjun:~# awk '{FS=":";OFS="#"; print $1 ,$7}' /etc/passwd
+	
+```
+awk 有BEGIN和END模块，简单来说，BENGIN总是先执行，END总是后执行。
+```shell
+root@zhtjun:~# awk 'BEGIN{print "列1 列2 列3 列4"}{print $0}' test.txt
+列1 列2 列3 列4
+11 22 33
+44 55
+66
+
+77 88 99
+
+#awk具有流程控制类似C语言，如if,while,for等。还有内置的数学函数。字符串处理行数。调用系统行数。
+#awk还可以写成脚本，格式为： awk [选项] -f awk-script[文件名]
+root@zhtjun:~#  awk '{if($2>87){print $0}}' test.txt
+#打印一行后就退出
+root@zhtjun:~#  awk '{if($2>87){print $0；exit}}' test.txt
+```
+
+#### 进程和作业
 
 
