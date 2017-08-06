@@ -754,5 +754,101 @@ root@zhtjun:~#  awk '{if($2>87){print $0；exit}}' test.txt
 ```
 
 ##### 进程和作业
-命令
+正在运行的一个或者多个进程称为一个作业。
+命令ps查看正在系统中运行的进程信息。
+```SHELL
+# 分别是进程标识好PID(Process ID)，终端号 TTY，进程占用CPU时间，相应的命令。
+root@zhtjun:~# ps
+  PID TTY          TIME CMD
+ 2627 pts/0    00:00:00 bash
+ 2680 pts/0    00:00:00 ps
 
+# 加上选项-f，查看显示多信息。（f是full-format listing的意思），包括父进程标识号PPID，进程启动时间STIME和命令参数。 
+root@zhtjun:~# ps -f
+UID        PID  PPID  C STIME TTY          TIME CMD
+root      2627  2625  0 09:19 pts/0    00:00:00 -bash
+root      2890  2627  0 09:22 pts/0    00:00:00 ps -f
+```
+
+##### 挂进进程<Ctrl+Z>
+挂起进程后，可以用内置命令jobs查看作业状态。作业号只在当前窗口有效，进程则是在整个系统中有效。
+```shell
+# 1是作业号，Stopped是组欧俄的一种状态，表示暂停不是完全停止。
+root@zhtjun:~# jobs
+[1]+  Stopped                 vi test.txt
+
+# 加上-l可查看进程ID，选项-p,仅显示进程ID。选项-s,显示状态为 Stopped的作业。选项-r,显示状态为运行中（Running）状态的作业。
+root@zhtjun:~# jobs -l
+[1]+  3276 Stopped                 vi test.txt
+root@zhtjun:~# 
+```
+##### 前台fg和后台fg
+```shell
+# +代表最近作业，-代表前一个作业
+root@zhtjun:~# jobs
+[1]-  Stopped                 vi test.txt
+[2]+  Stopped                 cat
+# 当前2条后台命令，希望吧莫条命令拿到前台（foreground）,可以用内置命令fg，格式为fg [作业号]
+```
+|    引用            |        所值的后台作业           |
+|:-------------:|:-------------|
+|%N    | 编号为N的后台作业 |
+|%string   | 命令以string开头的作业 |
+|%?string  | 命令包含string的作业 |
+|%+   | 最近被放到后台的作业 |
+|%@    | 同上 |
+|%-    | 第二近近被放到后台的作业 |
+
+命令bg把作业到后台执行。
+##### 发送信号命令kill
+kill -l可以列出所有信号名和编号
+
+用命令kill给作业或者进程传递信号的格式为：kill [-s 信号名 | -n 信号编号 | -信号名 | -信号编号] 作业号或者进程ID，
+如果没有指定信号名，默认信号是SIFGTERM。
+```shell
+root@zhtjun:~# find / -name "*.gz" 2>/dev/null
+/home/apache/httpd-2.2.31.tar.gz
+/home/nodeproject/microblog.tar.gz
+^Z
+[1]+  Stopped                 find / -name "*.gz" 2> /dev/null
+# 运行jobs，可见当前有一个作业，状态为stopped。
+root@zhtjun:~# jobs
+[1]+  Stopped                 find / -name "*.gz" 2> /dev/null
+# 如果想终止该作业，用kill %1
+root@zhtjun:~# kill %1
+
+[1]+  Stopped                 find / -name "*.gz" 2> /dev/null
+# 再次查看，作业状态变为Terminated（因为收到默认信号TERM）
+root@zhtjun:~# jobs
+[1]+  Terminated              find / -name "*.gz" 2> /dev/null
+# 由于各种原因用默认信号的kill命令有时会终止不了进程，信号KILL，即编号为9的信号可以来强行终止进程或作业。
+# 用KILL强行终止,进程ID也可以换成作用号。还可以换成kill -KILL 123321或者kill -n 9 123321 或者 kill -p 123321
+root@zhtjun:~# kill -s SIGKILL 123321(进程ID)
+
+```
+
+##### 等待命令wait
+内置命令wait的格式为：wait [id]
+id是进程ID或者作业号。
+
+##### 捕获信号<Ctr+c>
+Ctr+c可以用来中断正在运行的程序，如果按下Ctr+c时不仅希望程序停止运行，还希望做一些其他操作，可以通过内置命令trap实现。
+格式为：trap commands signals 
+
+commands代表一组命令，用分号隔开。signals代表一组信号，用空格隔开。trap的作用是为signals设置陷阱，当shell收到signals中的某个信号时，
+就运行commands。
+
+命令trap -l和kill -l的效果是一样的。
+
+信号SIGKILL和SIGSTOP不能被捕获，阻塞或忽略，就是说对这2个信号设置陷阱是无效的，命令kill -19(或者-STOP，或者-SIGSTOP)加进程号或作业ID可强行暂停进程或作业。
+
+终止不掉的进程可以用kill -9(或者kill -KILL 或者kill -SIGKILL)来强行终止，是因为信号KILL不能被捕获。
+
+##### 移除作业的命令disown
+格式为：disown [-h] [-ar] [作业号]
+命令disown加作业号不是用来停止某个作业的，而是从当前的作业表中移除该作用，移除后jobs就查找不到了，ps仍然可以查找到。
+-r的作用是移除当前shell处于running状态的作业。
+-h 是使作业忽略SIGHUP信号
+-ar 使所有的作业忽略SIGHUP信号
+
+##### 暂停shell的命令suspend
