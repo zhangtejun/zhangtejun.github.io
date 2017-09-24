@@ -54,6 +54,7 @@ n个结点（元素的存储映像）链接成一个链表，即线性表的链�
 
 ### 栈(Stack)和队列(Queue)
 栈 (Stack)是一种后进先出(last in first off，LIFO)的数据结构，而队列(Queue)则是一种先进先出 (fisrt in first out，FIFO)的结构。
+
 #####Stack的实现
 * 数组
   ```java
@@ -126,6 +127,7 @@ n个结点（元素的存储映像）链接成一个链表，即线性表的链�
   
 * 链表
   * 定义一个内部类来保存每个链表的节点。
+  
   ```java
   import java.util.HashMap;
   
@@ -211,6 +213,7 @@ n个结点（元素的存储映像）链接成一个链表，即线性表的链�
   ```
   
 #####队列(Queue)的实现
+
 Queue是一种先进先出的数据结构，和Stack一样，他也有链表和数组两种实现。[参考链接 ](http://blog.jobbole.com/79267/)
 * 数组 和Stack的实现方式不同，在Queue中，我们定义了head和tail来记录头元素和尾元素。当enqueue的时候，tial加1，将元素放在尾部，当dequeue的时候，head减1，并返回。
  ```java
@@ -350,6 +353,7 @@ n=0时称为空树。在任意一棵非空树中：(1)有且仅有一个特定�
 
 * 查找
 1. 迭代的方式
+
 ```java
 public class  BinarySearchTree<BSTKey extends Comparable<BSTKey>,BSTValue>{
 
@@ -455,7 +459,9 @@ public class  BinarySearchTree<BSTKey extends Comparable<BSTKey>,BSTValue>{
 }
 
 ```
+
 2. 递归的方式
+
 ```java
     private BSTValue get2Value(Node root, BSTKey key) {
         if (key == null) throw new IllegalArgumentException("called get() with a null key");
