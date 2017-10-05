@@ -242,7 +242,7 @@ date -s "20150909" 修改日期    date -s "20：09：08" 修改日期
 	
 	* 主分区
 		
-		  最多只能创建4个主分区。mbr结构只有4个条目
+		最多只能创建4个主分区。mbr结构只有4个条目
 			
 	* 扩展分区
 		
@@ -510,18 +510,18 @@ date -s "20150909" 修改日期    date -s "20：09：08" 修改日期
       也可以通过直接修改/etc/passwd的方式实现，但是不建议
         
 修改用户信息
-```shell
-命令usermod用来修改用户信息
-usermod 参数 username
-命令usermod支持以下参数
--l 新的用户名
--u 新的userid
--d 用户家目录位置
--g 用户所在主族
--G 用户所属附属组
--L 锁定用户使其不能登录路
--U 解除锁定
-```
+  ```shell
+  命令usermod用来修改用户信息
+  usermod 参数 username
+  命令usermod支持以下参数
+  -l 新的用户名
+  -u 新的userid
+  -d 用户家目录位置
+  -g 用户所在主族
+  -G 用户所属附属组
+  -L 锁定用户使其不能登录路
+  -U 解除锁定
+  ```
 		
 删除用户	
 ```shell
@@ -562,15 +562,18 @@ userdel -r nash_su (同时删除用户家目录)
    注意：目录必须拥有X权限，否则无法查看其内容。
 
     Linux权限基于UGO模型进行控制：
-    ```shell
-      U代表User，G代表Group，O代表Other
-      每一个文件的权限基于UGO进行设置
-      权限3个一组（rwx）,对应UGO分别设置
-      每一个文件拥有一个所属用户和所属组，对应UG，不属于该文件所属用户或所属组的使用O权限
-	  ```
+   
+    U代表User，G代表Group，O代表Other
+   
+    每一个文件的权限基于UGO进行设置
+   
+    权限3个一组（rwx）,对应UGO分别设置
+   
+    每一个文件拥有一个所属用户和所属组，对应UG，不属于该文件所属用户或所属组的使用O权限
+	
 	命令ls -l可以查看当前目录下文件的详细信息：
 	
-    ```javascript
+    ```shell
     drwxr-xr-- 2 nash_su training 208 Oct 1 13:50 linuxcast.nets
     ```
 	
