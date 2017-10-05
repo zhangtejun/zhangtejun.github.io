@@ -115,7 +115,7 @@ date -s "20150909" 修改日期    date -s "20：09：08" 修改日期
          reboot立即重启计算机
 
 **归档，压缩**
-    ```shell
+
     1. zip压缩文件
     
     zip linuxcast.zip(压缩后文件名)     myfile(压缩文件)
@@ -135,7 +135,6 @@ date -s "20150909" 修改日期    date -s "20：09：08" 修改日期
       tar -xvf linuxcast.tar(归档后文件名) 
       
       tar -cvzf linuxcast.tar.gz /etc(代表文件夹)  (归档后再压缩 实际数调用gzip)
-    ```	
 
 **查找**
 1. locate 快速查找文件，文件夹
