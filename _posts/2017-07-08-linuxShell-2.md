@@ -115,26 +115,28 @@ date -s "20150909" 修改日期    date -s "20：09：08" 修改日期
          reboot立即重启计算机
 
 **归档，压缩**
-1. zip压缩文件
+    ```shell
+    1. zip压缩文件
+    
+    zip linuxcast.zip(压缩后文件名)     myfile(压缩文件)
+    
+    2. unzip 解压zip文件
+    
+      upzip linuxcast.zip(压缩后文件名)  myfile(压缩文件)
+    
+    3. gzip压缩文件
+    
+      gzip linuxcast.zip(压缩后文件名)
+      
+    4. tar 用于归档文件（不压缩）
+    
+      tar -cvf linuxcast.tar(归档后文件名) myfile(想要归档文件/文件夹）
+      
+      tar -xvf linuxcast.tar(归档后文件名) 
+      
+      tar -cvzf linuxcast.tar.gz /etc(代表文件夹)  (归档后再压缩 实际数调用gzip)
+    ```	
 
-	zip linuxcast.zip(压缩后文件名) myfile(压缩文件)
-		
-2. unzip 解压zip文件
-
-	upzip linuxcast.zip(压缩后文件名) myfile(压缩文件)
-
-3. gzip压缩文件
-
-	gzip linuxcast.zip(压缩后文件名)
-	
-4. tar 用于归档文件（不压缩）
-
-	tar -cvf linuxcast.tar(归档后文件名) myfile(想要归档文件/文件夹）
-	
-	tar -xvf linuxcast.tar(归档后文件名) 
-	
-	tar -cvzf linuxcast.tar.gz /etc(代表文件夹)  (归档后再压缩 实际数调用gzip)
-	
 **查找**
 1. locate 快速查找文件，文件夹
 
@@ -275,17 +277,17 @@ date -s "20150909" 修改日期    date -s "20：09：08" 修改日期
 	
 2. FDISK（逻辑分区从5开始）
 	
-  fdisk命令只有具有超级用户权限才能够运行
-  
-  使用fdisk -l可以列出所有安装的磁盘及其分区信息
-  
-  使用fdisk/dev/sda可以对目标磁盘进行分区操作
-  
-  分区之后需要使用partprobe命令让内核更新分区信息、
-  
-  否则需要重启才能识别新的分区。
-  
-  /proc/partitions文件也可以用来查看分区信息。
+    fdisk命令只有具有超级用户权限才能够运行
+    
+    使用fdisk -l可以列出所有安装的磁盘及其分区信息
+    
+    使用fdisk/dev/sda可以对目标磁盘进行分区操作
+    
+    分区之后需要使用partprobe命令让内核更新分区信息、
+    
+    否则需要重启才能识别新的分区。
+    
+    /proc/partitions文件也可以用来查看分区信息。
 		
 ##### Linux文件系统
 1. 文件系统
@@ -395,6 +397,7 @@ date -s "20150909" 修改日期    date -s "20：09：08" 修改日期
 
   3. UMOUNT
   
+    ```shell
     命令umount用来卸载已经挂载的文件系统，相当于windows中的弹出
     
     umount 文件系统/挂载点
@@ -408,6 +411,7 @@ date -s "20150909" 修改日期    date -s "20：09：08" 修改日期
     也可以使用命令lsof查看正在被使用的文件：
     
     lsof/mnt
+    ```
 
 4. 自动挂载
    配置文件/etc/fstab用来定义需要自动挂载的文件系统，fstab中每一行代表一个挂载配置，格式如下：
@@ -478,62 +482,76 @@ date -s "20150909" 修改日期    date -s "20：09：08" 修改日期
 	
       命令useradd用以创建一个新用户
       
-        useradd nash_su
-        这个命令会执行以下操作：
-        1 在/etc/passwd中添加用户信息
-        2 如果用户使用passwd命令创建密码。则将密码保存在/etc/shadow中（passwd nash_su）
-        3 为用户创建一个新的家目录/home/nash_su
-        4 将.etc/skel中文件复制到家目录中    
-        5 建立一个与用户名相同的组，新建用户默认属于个组
+      useradd nash_su
+      
+      这个命令会执行以下操作：
+      
+      1 在/etc/passwd中添加用户信息
+      
+      2 如果用户使用passwd命令创建密码。则将密码保存在/etc/shadow中（passwd nash_su）
+      
+      3 为用户创建一个新的家目录/home/nash_su
+      
+      4 将.etc/skel中文件复制到家目录中    
+      
+      5 建立一个与用户名相同的组，新建用户默认属于个组
       
       命令useradd支持以下参数
+     
+      -d 指定家目录
       
-        -d 指定家目录
-        -s 登录shell
-        -u userid
-        -g 主组
-        -G 附属组（最多31个，用“，”分割
-        也可以通过直接修改/etc/passwd的方式实现，但是不建议
+      -s 登录shell
+      
+      -u userid
+      
+      -g 主组
+      
+      -G 附属组（最多31个，用“，”分割
+      
+      也可以通过直接修改/etc/passwd的方式实现，但是不建议
         
-	修改用户信息
+修改用户信息
+```shell
+命令usermod用来修改用户信息
+usermod 参数 username
+命令usermod支持以下参数
+-l 新的用户名
+-u 新的userid
+-d 用户家目录位置
+-g 用户所在主族
+-G 用户所属附属组
+-L 锁定用户使其不能登录路
+-U 解除锁定
+```
 		
-		命令usermod用来修改用户信息
-		usermod 参数 username
-		命令usermod支持以下参数
-		-l 新的用户名
-		-u 新的userid
-		-d 用户家目录位置
-		-g 用户所在主族
-		-G 用户所属附属组
-		-L 锁定用户使其不能登录路
-		-U 解除锁定
-		
-	删除用户	
+删除用户	
+```shell
+命令userdel用以删除指定的用户
+userdel nash_su (不会删除用户家目录)
+userdel -r nash_su (同时删除用户家目录)
+```
+组
 	
-		命令userdel用以删除指定的用户
-		userdel nash_su (不会删除用户家目录)
-		userdel -r nash_su (同时删除用户家目录)
-	组
-	
-  几乎所有的操作系统都有组的概念。通过组，我们可以更加方便的归类，管理用户
-  一般来讲，我们使用部门，职能或地理区域的分类方式来创建使用组。
-  每个组都有一个组id
-  组信息保存在/etc/group中
-  每个用户拥有一个组，同时还可以拥有最多31个附属组
-		
-	创建，修改，删除组
-		命令groupadd用以创建组
-		命令groupmod -n/-g newname/newGid oldname/oldGid  修改组名/组id
-		命令groupdel 删除组
-
+几乎所有的操作系统都有组的概念。通过组，我们可以更加方便的归类，管理用户
+一般来讲，我们使用部门，职能或地理区域的分类方式来创建使用组。
+每个组都有一个组id
+组信息保存在/etc/group中
+每个用户拥有一个组，同时还可以拥有最多31个附属组
+```shell		
+创建，修改，删除组
+命令groupadd用以创建组
+命令groupmod -n/-g newname/newGid oldname/oldGid  修改组名/组id
+命令groupdel 删除组
+```
 ##### Linux权限机制
-1. 权限
+* 权限
     权限是操作系统用来限制对资源的访问的机制，权限一般分为读，写，执行。系统中每个文件都拥有特定的权限，所属组及
     所属用户，通过这样的机制来限制哪些用户，那些组可以对特定文件进行什么样的操作。
     
     每个进程都是一某个用户的身份运行，所以进程的权限与用户权限一样，用户的权限大，该进程拥有权限就大。
-2. 文件权限
+* 文件权限
 
+  ```shell
     权限              对文件的影响         对目录的影响
     
     r(读取)           可读取文件内容        可列出目录内容
@@ -541,11 +559,11 @@ date -s "20150909" 修改日期    date -s "20：09：08" 修改日期
     w(写入)           可修改文件内容        可在目录中创建删除文件
     
     x(执行)           可以作为命令执行       可访问目录内容
-  
+  ```
    注意：目录必须拥有X权限，否则无法查看其内容。
 
     Linux权限基于UGO模型进行控制：
-    ```
+    ```shell
       U代表User，G代表Group，O代表Other
       每一个文件的权限基于UGO进行设置
       权限3个一组（rwx）,对应UGO分别设置
@@ -553,11 +571,13 @@ date -s "20150909" 修改日期    date -s "20：09：08" 修改日期
 	  ```
 	命令ls -l可以查看当前目录下文件的详细信息：
 	
-	drwxr-xr-- 2 nash_su training 208 Oct 1 13:50 linuxcast.net
+    ```javascript
+    drwxr-xr-- 2 nash_su training 208 Oct 1 13:50 linuxcast.nets
+    ```
 	
    drwxr-xr--   d代表文件类型是一个目录，-是普通文件，l是链接等
 	
-3. 修改文件所属用户，组
+* 修改文件所属用户，组
 	命令chown用以改变文件的所属用户：
 	
 	chown nash_su linuxcast.net
@@ -570,51 +590,53 @@ date -s "20150909" 修改日期    date -s "20：09：08" 修改日期
     
     -R参数递归的修改目录下的所有文件的所属组
 		
-4. 修改权限
+* 修改权限
+  ```shell
+  命令chmod用以修改文件的权限
+      
+     chmod 模式 文件
+        
+     模式为如下格式：
+      
+     u,g,o分别代表用户，组和其他
+     a可以代表ugo
+     +,-代表加入或删除对应权限
+     r,w,x代表三种权限
     
-    命令chmod用以修改文件的权限
-        
-       chmod 模式 文件
-          
-       模式为如下格式：
-        
-       u,g,o分别代表用户，组和其他
-       a可以代表ugo
-       +,-代表加入或删除对应权限
-       r,w,x代表三种权限
+     模式示例：
+    
+     chmod u+rw linuxcast.net
+     chmod g-x linuxcast.net
+     chmod o+r linuxcast.net
+     chmod a-x linuxcast.net
       
-       模式示例：
-      
-       chmod u+rw linuxcast.net
-       chmod g-x linuxcast.net
-       chmod o+r linuxcast.net
-       chmod a-x linuxcast.net
-        
-      递归修改文件夹内的权限
-      
-      chmod -R a-x linuxcast.net
-      
-      命令chmod也支持数字方式修改权限	，三个权限分别由三个数字表示：
-      
-      `-r =4 (2^2)`
-      
-      `-w =2 (2^1)`
-      
-      `-r =1 (2^0)`
-      
-      没有权限就为0
-      
-      使用数字表示权限时，每组分别对应数字之和：
-      
-      rw =4+2 =6
-      
-      rwx=4+2+1 =7
-      
-      rw =4+1 =5
-      
-      所以，使用数字表示ugo权限：ugo必须全部修改
-      
-      `chmod 660 linuxcast.net   ==   rw-rw----`
+    递归修改文件夹内的权限
+    
+    chmod -R a-x linuxcast.net
+    
+    命令chmod也支持数字方式修改权限	，三个权限分别由三个数字表示：
+    
+    -r =4 (2^2)
+    
+    -w =2 (2^1)
+    
+    -r =1 (2^0)
+    
+    没有权限就为0
+    
+    使用数字表示权限时，每组分别对应数字之和：
+    
+    rw =4+2 =6
+    
+    rwx=4+2+1 =7
+    
+    rw =4+1 =5
+    
+    所以，使用数字表示ugo权限：ugo必须全部修改
+    
+    chmod 660 linuxcast.net   ==   rw-rw----
+  ```    
+
       
 ##### Linux扩展权限
 每个终端都拥有一个umask属性，来确定新建文件，文件夹的默认权限
