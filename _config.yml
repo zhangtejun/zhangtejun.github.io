@@ -43,6 +43,7 @@ p11: "/assets/p11.gif"
 p12: "/assets/p12.gif"
 p13: "/assets/p13.gif"
 dispatcher: "/assets/dispatcher.png"
+sf1: "/assets/sf1.png"
 
 
 # Build settings
