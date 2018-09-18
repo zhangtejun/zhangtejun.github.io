@@ -69,7 +69,7 @@ sonar.language 指定了要分析的开发语言（特定的开发语言对应�
    
 #####SonarQube服务器
 
-> 所有jenkins服务器可公用一个SonarQube服务器(10.129.41.32已安装)。
+> 所有jenkins服务器可公用一个SonarQube服务器(已安装)。
 
 > 如果不需要安装SonarQube服务器可跳过以下步骤：
 
@@ -78,15 +78,15 @@ sonar.language 指定了要分析的开发语言（特定的开发语言对应�
     
     ```javascript
     # 启动
-    cd /ebank/sonarqube/sonarqube-5.5/bin/linux-x86-64
+    cd /home/sonarqube/sonarqube-5.5/bin/linux-x86-64
     nohup ./sonar.sh start &   
     
     # 停止
-    cd /ebank/sonarqube/sonarqube-5.5/bin/linux-x86-64
+    cd /home/sonarqube/sonarqube-5.5/bin/linux-x86-64
     nohup ./sonar.sh stop & 
     
     # 重启
-    cd /ebank/sonarqube/sonarqube-5.5/bin/linux-x86-64
+    cd /home/sonarqube/sonarqube-5.5/bin/linux-x86-64
     nohup ./sonar.sh restart &    
     ```
 
@@ -94,7 +94,7 @@ sonar.language 指定了要分析的开发语言（特定的开发语言对应�
 
 >登陆jenkins服务器，cd到任意目录，拷贝Sonar-Scanner到该目录。（上述Jenkins配置Sonar-Scanner 需要用到该目录）
 ```javascript
-scp -r weblogic@10.134.11.40:/weblogic/sonnar .
+scp -r userName@xx.xx.xx.xx:/weblogic/sonnar .
 
 #增加Sonar
 export  SONAR_RUNNER_HOME=/weblogic/sonnar/SonarQubeScanner/sonar-runner-2.5-RC1 #该路径按需调整
@@ -104,7 +104,7 @@ export  PATH=${SONAR_RUNNER_HOME}/bin:${PATH}
 可执行 sonar-runner -h 
 ```
 > 至此所有配置已完成，可登陆jenkins构建项目及查看报告，
-项目构建完成后可点击相应图标或者链接`http://10.129.41.32:9051`查看结果，默认管理员账户 `admin/admin`（注：代码有错误会导致构建失败）
+项目构建完成后可点击相应图标或者链接`http://xx.xx.xx.xx:xxxx`查看结果，默认管理员账户 `admin/admin`（注：代码有错误会导致构建失败）
 
 
 #### 方案二  开发人员本地进行静态代码分析 
@@ -112,7 +112,7 @@ export  PATH=${SONAR_RUNNER_HOME}/bin:${PATH}
 > 配置pom.xml，在<properties>节点增加sonar host参数：
 ```javascript
 <properties>
-  <sonar.host.url>http://10.129.41.32:9050/</sonar.host.url>
+  <sonar.host.url>http://xx.xx.xx.xx:xxxx/</sonar.host.url>
 </properties>
 ```
 >在pom.xml中增加<plugin>节点增加
@@ -125,7 +125,7 @@ export  PATH=${SONAR_RUNNER_HOME}/bin:${PATH}
 ```
 > 执行maven构建，`mvn sonar:sonar`
 
-> 链接`http://10.129.41.32:9051`查看报告
+> 链接`http://xx.xx.xx.xx:xxxx`查看报告
 
 #### 方案三 使用eclipse的sonarLint进行静态代码分析 
 > 需要升级eclipse，暂时无法在sonarqube服务器上查看分析报告（需要sonarqube 5.6及以上版本和jdk1.8）,
