@@ -3,7 +3,7 @@ layout: post
 title:  "Zookeeper的安装与配置"
 date:   2017-06-19 15:00:00
 author: zhangtejun
-categories: zhangtejun
+categories: Zookeeper
 ---
 ##### Zookeeper的安装与配置
 

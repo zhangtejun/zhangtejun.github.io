@@ -3,7 +3,7 @@ layout: post
 title:  "linuxShell2"
 date:   2017-07-08 10:36:00
 author: zhangtejun
-categories: zhangtejun
+categories: linux
 ---
 ##### shell 分为CLI与GUI
 壳层（Shell）在计算机科学中，是指“提供用户使用界面”的软件，通常指的是命令行界面的解析器。

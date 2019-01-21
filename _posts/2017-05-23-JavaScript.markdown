@@ -3,7 +3,7 @@ layout: post
 title:  "JavaScript"
 date:   2017-05-23 10:53:16
 author: zhangtj
-categories: zhangtj
+categories: JavaScript
 ---
 [Ecma-262.pdf](http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-262.pdf)
 

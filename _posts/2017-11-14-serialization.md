@@ -3,7 +3,7 @@ layout: post
 title:  "serialization"
 date:   2017-11-14 14:44:21
 author: zhangtejun
-categories: zhangtejun
+categories: Java
 ---
 ##### 序列化
 对象序列化（object serialization）API框架，用来将对象编码成一个字节流（序列化serializing）

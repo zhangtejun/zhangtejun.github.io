@@ -3,7 +3,7 @@ layout: post
 title:  "DispatcherServlet"
 date:   2017-09-10 10:29:00
 author: zhangtejun
-categories: zhangtejun
+categories: Spring
 ---
 ##### DispatcherServlet
 用于HTTP请求处理程序/控制器的中央调度程序。

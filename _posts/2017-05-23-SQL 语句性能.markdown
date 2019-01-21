@@ -3,7 +3,7 @@ layout: post
 title:  "JavaScript"
 date:   2017-09-23 08:53:16
 author: zhangtejun
-categories: zhangtejun
+categories: sql
 ---
 ##### SQL 语句性能
 Informix 2个工具可以查看sql执行性能。

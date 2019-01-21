@@ -3,7 +3,7 @@ layout: post
 title:  "Redis数据类型"
 date:   2017-06-18 10:29:00
 author: zhangtejun
-categories: zhangtejun
+categories: Redis
 ---
 ##### Redis的五大数据类型
 

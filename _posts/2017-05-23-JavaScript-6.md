@@ -3,7 +3,7 @@ layout: post
 title:  "JavaScript事件循环"
 date:   2017-05-25 14:07:53
 author: zhangtejun
-categories: zhangtejun
+categories: JavaScript
 ---
 # JavaScript之Event Loop
 

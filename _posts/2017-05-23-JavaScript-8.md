@@ -3,7 +3,7 @@ layout: post
 title:  "8.JavaScript-闭包"
 date:   2017-05-23 16:59:12
 author: zhangtejun
-categories: zhangtejun
+categories: JavaScript
 ---
 # JavaScript深入之闭包
 

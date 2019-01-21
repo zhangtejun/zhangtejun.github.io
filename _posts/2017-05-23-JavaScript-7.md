@@ -3,7 +3,7 @@ layout: post
 title:  "7.JavaScript-执行上下文"
 date:   2017-05-23 13:35:21
 author: zhangtejun
-categories: zhangtejun
+categories: JavaScript
 ---
 # JavaScript深入之执行上下文
 

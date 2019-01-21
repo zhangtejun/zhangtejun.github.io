@@ -3,7 +3,7 @@ layout: post
 title:  "ionic滚动"
 date:   2017-06-15 15:12:25
 author: zhangtejun
-categories: zhangtejun
+categories: JavaScript-ionic
 ---
 # ionic scroll
 
