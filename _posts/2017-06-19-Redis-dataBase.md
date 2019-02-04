@@ -3,7 +3,7 @@ layout: post
 title:  "redis的持久化"
 date:   2017-06-19 21:29:00
 author: zhangtejun
-categories: zhangtejun
+categories: Redis
 ---
 ##### redis的持久化
 

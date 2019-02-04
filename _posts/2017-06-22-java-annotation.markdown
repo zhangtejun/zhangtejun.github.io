@@ -3,7 +3,7 @@ layout: post
 title:  "注解Annotation"
 date:   2017-06-22 10:53:02
 author: zhangtejun
-categories: zhangtejun
+categories: Java
 ---
 ##### 注解
 
@@ -23,7 +23,7 @@ Java语言解释器会忽略这些注解，而由第三方工具负责对注解�
  * 	  @Documented
  *    @Inherited
  * 
- * 2. 元注解
+ * 2. 元注解(注解的注解)
  * 	@Target 标识这个注解的作用域.
  *          ElementType.METHOD : 这个注解的作用域的列表，METHOD是方法声明，除此之外，还有：
  *          ElementType.CONSTRUCTOR（构造方法声明）
@@ -35,7 +35,7 @@ Java语言解释器会忽略这些注解，而由第三方工具负责对注解�
  *          ElementType.TYPE（类接口）
  * 3. 生命周期
  * @Retention 声明注解的保留期限,即它的生命周期。
- * 		RUNTIME就是在运行时存在，可以通过反射读取。除此之外，还有:
+ * 		RUNTIME 就是在运行时存在，可以通过反射读取。除此之外，还有:
  * 		SOURCE（只在源码显示，编译时丢弃）
  * 		CLASS（编译时记录到class中，运行时忽略）
  * 4. 标识
@@ -63,6 +63,7 @@ public @interface MyAnnotation {
 ```
 ##### AnnotatedElement接口
 ```java
+//java.lang.reflect包下
 public interface AnnotatedElement
 ```
 表示目前正在此 VM 中运行的程序的一个已注释元素。该接口允许反射性地读取注释。由此接口中的方法返回的所有注释都是不可变并且可序列化的。调用方可以修改已赋值数组枚举成员的访问器返回的数组；这不会对其他调用方返回的数组产生任何影响。
@@ -82,3 +83,63 @@ public interface AnnotatedElement
 ![导图来自网络]({{ site.annotation | prepend: site.baseurl }})
 
 ##### 
+```java
+@AnnotationA(value = "aa",lValues = {1,2,3})
+public class AnnotationDemo extends AnnotationSub {
+    public static void main(String[] args) throws ClassNotFoundException {
+        Class<?> clazz = AnnotationDemo.class;
+        Annotation[] annotations =clazz.getAnnotations();//返回此元素上存在的所有注解，包括从父类继承的
+        System.out.println("an:"+ Arrays.toString(annotations));
+
+        Arrays.stream(annotations).forEach(System.out::println);
+
+        AnnotationA annotationA = clazz.getAnnotation(AnnotationA.class);//该元素如果存在指定类型的注解，则返回这些注解，否则返回 null。
+        System.out.println(annotationA);
+
+        Annotation[] annotations1 = clazz.getDeclaredAnnotations();//返回直接存在于此元素上的所有注解不包括继承
+        Arrays.stream(annotations1).forEach(System.out::println);
+
+        // Java 8中新增加的元注解@Repeatable，它表示在同一个位置重复相同的注解
+        // Java8中 ElementType 新增两个枚举成员，TYPE_PARAMETER 和 TYPE_USE,新增的TYPE_PARAMETER可以用于标注类型参数，
+        // 而TYPE_USE则可以用于标注任意类型(不包括class),TYPE_PARAMETER用来支持在Java的程序中做强类型检查.配合第三方插件工具,可以在编译的时候检测出runtimeerror
+    }
+
+}
+
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface AnnotationA {
+    // 1，默认是 public abstract
+    // 2, 同时可选择使用default提供默认值,public abstract String value() default "";
+    String value();
+    // 3, 元素数据类型,可以是所有基本类型（int,float,boolean,byte,double,char,long,short），String，Class，enum，Annotation，及其类型的数组
+    boolean hasNext() default false;
+    enum Status {RED,BLUE}
+    Class<?> testCase() default String.class;
+    long[] lValues();
+    AnnotationB annotationB() default @AnnotationB(value="AnnotationB",hasTrue=true);
+}
+
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Repeatable(AnnotationC.class)
+@Inherited
+public @interface AnnotationB {
+    boolean hasTrue() default false;
+    String value() default "";
+}
+
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Inherited
+public @interface AnnotationC {
+    AnnotationB [] value();
+}
+
+@AnnotationB("23")
+@AnnotationB("231")
+public class AnnotationSub {
+    //
+}
+
+```

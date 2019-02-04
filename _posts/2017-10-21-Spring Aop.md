@@ -3,7 +3,7 @@ layout: post
 title:  "spring aop"
 date:   2017-10-21 08:13:04
 author: zhangtejun
-categories: zhangtejun
+categories: Spring
 ---
 ##### Introduction
 面向切面编程（AOP）提供另外一种思考程序结构的方式，通过这种方式弥补了面向对象编程（OOP）的不足。 

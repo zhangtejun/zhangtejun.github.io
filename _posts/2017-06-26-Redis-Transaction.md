@@ -3,7 +3,7 @@ layout: post
 title:  "redis事务(Transaction)"
 date:   2017-06-26 20:07:00
 author: zhangtejun
-categories: zhangtejun
+categories: Redis
 ---
 ##### redis事务
 是什么：可以一次执行多个命令，本质是一组命令的集合。一个事务中的所有命令都会序列化，按顺序地串行化执行而不会被其它命令插入，不许加塞。

@@ -3,7 +3,7 @@ layout: post
 title:  "linuxShell"
 date:   2017-07-08 10:32:00
 author: zhangtejun
-categories: zhangtejun
+categories: linux
 ---
 ##### 创建符号链接(软链接)和硬链接命令 ln
 windows下有快捷方式，linux下对应的是符号链接(symbolic links),建立符号链接格式为：

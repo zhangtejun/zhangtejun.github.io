@@ -3,7 +3,7 @@ layout: post
 title:  "Logical Volume（逻辑卷）"
 date:   2017-10-04 20:44:21
 author: zhangtejun
-categories: zhangtejun
+categories: linux
 ---
 ##### LVM
 LVM是 Logical Volume Manager(逻辑卷管理)的简写，它由Heinz Mauelshagen在Linux 2.4内核上实现。

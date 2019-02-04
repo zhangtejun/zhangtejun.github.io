@@ -3,7 +3,7 @@ layout: post
 title:  "5.JavaScript-作用域链"
 date:    2017-05-23 16:58:45
 author: zhangtejun
-categories: zhangtejun
+categories: JavaScript
 ---
 # JavaScript之作用域链
 

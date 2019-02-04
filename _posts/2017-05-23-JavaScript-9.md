@@ -3,7 +3,7 @@ layout: post
 title:  "9.JavaScript-参数按值传递"
 date:   2017-05-23 16:59:25
 author: zhangtejun
-categories: zhangtejun
+categories: JavaScript
 ---
 # JavaScript深入之参数按值传递
 

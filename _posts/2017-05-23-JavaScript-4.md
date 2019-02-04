@@ -3,7 +3,7 @@ layout: post
 title:  "4.JavaScript-变量对象"
 date:   2017-05-23 16:44:43
 author: zhangtejun
-categories: zhangtejun
+categories: JavaScript
 ---
 # JavaScript之变量对象
 

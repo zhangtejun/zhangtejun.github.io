@@ -3,7 +3,7 @@ layout: post
 title:  "2.JavaScript-词法作用域和动态作用域"
 date:   2017-05-23 13:35:21
 author: zhangtejun
-categories: zhangtejun
+categories: JavaScript
 ---
 # JavaScript之词法作用域和动态作用域
 

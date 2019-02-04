@@ -3,7 +3,7 @@ layout: post
 title:  "10.JavaScriptcall和apply的模拟实现"
 date:   2017-05-23 13:35:21
 author: zhangtejun
-categories: zhangtejun
+categories: JavaScript
 ---
 # JavaScript深入之call和apply的模拟实现
 

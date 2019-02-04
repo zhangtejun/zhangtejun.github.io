@@ -3,7 +3,7 @@ layout: post
 title:  "1.JavaScript原型到原型链"
 date:   2017-05-23 13:35:21
 author: zhangtejun
-categories: zhangtejun
+categories: JavaScript
 ---
 # JavaScript之原型到原型链
 
