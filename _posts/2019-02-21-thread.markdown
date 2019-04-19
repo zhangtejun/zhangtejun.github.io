@@ -1,0 +1,266 @@
+---
+layout: post
+title:  "thread"
+date:   2018-02-18 10:53:02
+author: zhangtejun
+categories: java
+---
+##### thread State状态 6个枚举
+```java
+public enum State {
+        NEW,// 新创建了一个线程对象，但还没有调用start()方法
+        RUNNABLE,// 线程对象被创建后，其它线程调用了该对象的start()方法，从而来启动该线程。
+        BLOCKED,// 阻塞状态是线程因为某种原因放弃CPU使用权，暂时停止运行
+        WAITING,// 该状态的线程需要等待其他线程做出一些特定动作（通知或中断）
+        TIMED_WAITING,// 超时等待,该状态不同于WAITING，它可以在指定的时间后自行返回
+        TERMINATED //线程已经执行完毕
+    }
+```
+##### 停止线程
+1.  使用退出标志，使线程正常退出，也就是当run方法完成后线程终止。 
+2.  使用stop方法强行终止线程（这个方法不推荐使用，都是已过时的方法，因为stop和suspend、resume一样，也可能发生不可预料的结果）。 
+3.  使用interrupt方法中断线程
+```java
+public static boolean interrupted() {...};// 当前线程是否已经中断，该方法具有清除状态功能
+public boolean isInterrupted() {};// 线程是否已中断
+```
+```java
+public class Tets1 {
+    public static void main(String[] args) throws InterruptedException {
+            Runnable r = () -> {for (int i=0 ;i<1000;i++){
+                System.out.println("i="+i);}
+            };
+            Thread t = new Thread(r);
+            t.start();
+            Thread.sleep(1000);
+            t.interrupt();// 虽然是在t对象上调用interrupt方法，
+            System.out.println("是否停止1 ： "+t.isInterrupted());// false
+            System.out.println("是否停止2 ： "+t.isInterrupted());// false 当前线程为main,它未中断。
+        }
+    
+        @Test
+        public void t1(){
+            Thread.currentThread().interrupt();
+            System.out.println("是否停止1 ： "+Thread.interrupted());// true  interrupted判断当前线程是否已是停止状态，该方法具有清除状态功能
+            System.out.println("是否停止2 ： "+Thread.interrupted());// false
+        }
+ }
+```
+调用stop方法时会抛出`java.lang.ThreadDeath`异常，通常情况下该异常不需要显示捕获。该异常继承至Error。
+该方法已被废弃，原因为：强制停止线程有可能导致一些清理工作无法完成，如果对锁定对象进行锁的释放，可能会出现数据得不到同步处理，导致数据不一致。
+
+##### 暂停线程
+###### suspend / resume
+暂停线程意味着此线程还可以恢复运行，可以用suspend()方法暂停线程，使用resume()方法恢复线程的执行。但是如果使用不当，会造成公共的同步对象独占，
+使其他线程无法访问公共同步对象。
+
+该方法也会出现因线程的暂停而导致数据不同步。
+
+###### yield
+理论上来说，yield意味着 屈服，投降。yield方法的作用是放弃当前CPU资源，一个调用yield()方法的线程告诉虚拟机它乐意让其他线程占用自己的位置。
+但是放弃的时间不定，有可能刚刚放弃，马上又获得了CPU 时间片。
+* Yield是一个静态的原生(native)方法
+* Yield告诉当前正在执行的线程把运行机会交给线程池中拥有相同优先级的线程
+* Yield不能保证使得当前正在运行的线程迅速转换到可运行的状态
+* 它仅能使一个线程从运行状态转到可运行状态，而不是等待或阻塞状态
+
+>线程优先级（setPriority方法可设置线程优先级）
+>>在操作系统中，线程有优先级，优先级高的线程获得CPU资源要多，也就是说CPU优先执行优先级高的任务。  
+>>java中，线程的优先级范围为1 ~ 10，如果不在这个范围内JDK将抛出异常。  
+>>线程优先级具有继续性，如A线程启动B线程，则B线程的优先级同A线程。  
+>>线程优先级具有规则性，线程的优先级和代码的执行顺序无关，CPU只是尽量将资源让给优先级高的线程。
+>>线程优先级具有随机性和不确定性
+
+>守护线程
+>>Java分为两种线程：用户线程和守护线程
+>>守护线程具有“陪伴”的含义，当进程中不存在非守护线程时，则守护线程自动销毁，即程序终止。比如垃圾回收线程，进程中没有非守护线程，那该线程就没有存在的必要了。
+>>反过来说，只要任何非守护线程还在运行，程序就不会终止，守护进程就在运行。Daemon的作用就是为其他线程运行提供服务。
+
+##### 对象和变量的并发访问
+###### sychronized 同步方法
+Java平台中的任何一个对象都有唯一一个与之关联的锁，即监视器（Monitor）/内部锁，它是一种排它锁，能保证原子，可见和有序性。
+* 非实例变量：方法内的变量为线程安全，“非线程安全”问题存在于“实例变量”中，如果是方法内部的私有变量，则不存在该问题。
+* 实例变量：非线程安全
+>多个对象多个锁
+>>关键字sychronized 取得的锁都是对象锁，哪个线程先执行带sychronized的方法，哪个线程就获取到该方法所属对象的锁。
+>>A线程先持有object对象的lock锁，线程B可以异步调用object对象中的非sychronized方法，如果调用object对象中的被sychronized修饰的方法，则需要等待。
+>重入锁
+>>重入锁是指任意线程在获取到锁之后，再次获取该锁而不会被该锁所阻塞。
+>>当存在继承关系时，子类通过重入锁来调用父类的同步方法。即在子类的同步方法中调用父类的同步方法。
+>程序出现异常，锁会自动释放。
+>同步不具备继承性，但是子类可以不加该关键字。
+###### sychronized 同步语句块
+>当2个线程并发访问同一个对象的sychronized（this）同步代码块时，一段时间内只能被一个线程执行。也是持有当前对象锁。
+>表面看来，同步语句块可以作为同步方法的一部分，即不是同步方法中所有的操作都需要同步，可以用代码块来细化。
+>多个线程调用同一个对象中的不同 同步方法或不同sychronized(this)语句块时，是按照顺序执行的，相互也是阻塞的。
+>同步方和不同sychronized(非this)语句块是可以异步执行的。
+>sychronized(非this对象X)，将x对象本身作为‘对象监视器’。
+>>1. 多个线程执行sychronized(x)同步代码块时是同步状态，需要等待。
+>>2. 当其他线程执行x对象中的sychronized方法时，也是同步状态，需要等待。
+>>3. 当其他线程执行x对象中的sychronized(this)语句块时，也是同步状态，需要等待。
+###### 静态同步sychronized方法和sychronized（class）代码块
+>修饰静态方法是给Class类上锁，非static静态方法是给对象上锁。
+>同步sychronized(Class)代码块的作用同sychronized static方法一致。
+###### string常量池特性
+>sychronized(String)持有相同的锁。
+###### 内部类和静态内部类
+
+##### volatile  使实例变量在各线程间保持可见性。
+>使主存和工作内存中的值同步。线程私有栈数据和公有栈中的数据同步。
+>volatile 只能修饰变量，能保证数据可见性，不支持原子性。sychronized 即可以保证原子性，间接也保证数据可见性。
+>多线程访问volatile不会发送阻塞，sychronized会出现阻塞。
+>关键字volatile提示线程每次从主存中读取变量，而不是从私有内存中读取，这样可以保证同步数据的可见性。
+>如果修改的实例变量不是原子操作，比如i++，也是非线程安全的。
+>AtomicInteger原子操作，方法和方法间的调用不是原子的，要保证多个方法执行后，还保持原子性，需要加sychronized同步。
+
+#### 线程间的通信
+##### 等待/通知机制
+方法wait()的作用是使当前执行代码的线程进行等待,并释放共享资源锁，其是Object类的方法，在wait()方法所在代码行处停止执行，直到通知或中断为止。
+在调用wait()前，线程必须获得该对象的对象级别锁，即只能在同步方法或者同步代码块中调用wait()方法。
+notify()也需要在同步方法或者同步代码块中调用，线程也必须获得该对象的对象级别锁，该方法用来通知那些可能等待该对象的对象锁的其他线程
+，如果有多个线程等待，则有线程规划器随机选择其中一个呈现wait状态的线程，对其发出notify通知，并使它等待获取该对象的对象锁。
+执行notify方法后，当前线程不会马上释放锁，而是要等执行该方法的线程执行完后才释放。notify仅通知`一个线程`。如何没有待唤醒的线程，命令将被忽略。
+
+notifyAll()可以使所有正在等待队列的线程进入可运行状态。
+
+每个锁对象都有两个队列，一个是就绪队列，一个是阻塞队列，就绪队列存储了将要获得锁的线程，阻塞队列存储了被阻塞的线程，当一个被线程被唤醒 (notify)
+后，才会进入到就绪队列，等待获得锁。一个线程被wait后，就会进入阻塞队列。等待notify/notifyAll。
+
+当方法执行完wait后，锁自动释放，但是执行notify后，锁不自动释放。
+
+wait(long)方法： 等待某一时间内是否有线程对锁进行唤醒，如果没有则超过这个时间则自动唤醒。
+
+##### 通过管道进行线程间通信 字节流/字符流
+pipeStream用于不同线程间传递数据。
+
+jion方法（等待线程对象销毁）：主线程创建子线程，子线程进行耗时操作，往往主线程优先于子线程结束，如果主线程等待子线程完成并处理子线程的返回值时，jion可以实现
+jion内部使用wait方法进行等待，
+```java
+String lock = new String();
+MyThread1 myThread1 = new MyThread1(lock);
+myThread1.start();
+myThread1.join();
+System.out.println(5);//join方法使得 myThread1 run方法执行完成后，再执行由当前线程继续执行
+```
+
+jion(long)方法：设置等待时间，jion(2000)和sleep(2000)，sleep(long)方法在睡眠时不释放对象锁，join(long)方法在等待的过程中释放对象锁
+
+#### ThreadLocal
+每个线程拥有自己的私有数据。
+
+InheritableThreadLocal类可以让子线程从父线程中取得值。
+
+#### Lock
+##### ReenTrantLock
+* Condition 实现等待/通知
+notify/notifyAll方法进行通知时，被通知的线程由JVM随机选择，Condition可以有选择的通知，
+`Object 的wait()/wait(long)方法相当于Condition的await()/await(long,TimeUnit)`
+`Object notify()方法相当于Condition的signal()`
+`Object 的notifyAll()方法相当于Condition的signalAll()`
+```java
+public class LockService {
+    private Lock lock = new ReentrantLock();
+    public Condition conditionA = lock.newCondition();
+    public Condition conditionB = lock.newCondition();
+
+    public  void await_a(){
+        try {
+        lock.lock();
+        System.out.println("await time ； "+ System.currentTimeMillis());
+            conditionA.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }finally {
+            lock.unlock();
+        }
+    }
+    public  void await_b(){
+        try {
+            lock.lock();
+            System.out.println("await time ； "+ System.currentTimeMillis());
+            conditionB.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }finally {
+            lock.unlock();
+        }
+    }
+    public void signal_a(){
+        try {
+            lock.lock();
+            System.out.println("signal time ； "+ System.currentTimeMillis());
+            conditionA.signalAll();
+        } finally {
+            lock.unlock();
+        }
+    }
+    public void signal_b(){
+        try {
+            lock.lock();
+            System.out.println("signal time ； "+ System.currentTimeMillis());
+            conditionB.signalAll();
+        } finally {
+            lock.unlock();
+        }
+    }
+}
+```
+
+* 公平锁和非公平锁
+公平锁: FIFO先进先出，非公平锁：随机获得锁。
+
+#####
+>指令重排序
+>>编译器和处理器都可能执行重排序。
+
+>主内存（RAM）相对于处理器是一个慢设备，故处理器并不直接访问主内存，而是通过高速缓存Cache来访问，现代处理器还引入了写缓冲器来提高写高速缓存操作
+（来实现写主内存）的效率。
+##### 上下文切换
+上下文切换：一个线程被暂停，放弃处理器执行权，另一个线程由操作系统选中或者继续执行的过程。
+原子操作：在java语言中，对long/double（8字节64位，32位系统上会存在写高位和地位）类型以外的任何变量写操作都是原子的，volatile关键字修饰long/double也具有原子性。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---148---322
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
