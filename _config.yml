@@ -46,7 +46,7 @@ dispatcher: "/assets/dispatcher.png"
 sf1: "/assets/sf1.png"
 
 #download
-Notepad++: "/download/Notepad++.zip"
+notepad: "/download/Notepad++.zip"
 
 # Build settings
 markdown: kramdown
