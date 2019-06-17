@@ -1,0 +1,364 @@
+---
+layout: post
+title:  "Dummy Post 6"
+date:   2019-05-12 08:43:59
+author: zhangtejun
+categories: Unix
+tags: Unix
+---
+
+##### TCP/IP协议和OSI参考模型
+TCP/IP协议（Transmission Control Protocol/Internet Protocol）即传输控制协议/因特网互联协议。
+ISO开放互连系统参考模型(Open System Interconnection)七层结构（物理层、数据链路层、网络层、传输层、会话层、表示层、应用层）。
+* 应用层  OSI参考模型中最靠近用户的一层，是为计算机用户提供应用接口，也是为用户直接提供各种网络服务。常见应用层的网络服务协议有：HTTP，HTTPS，FTP，POP3、SMTP等。
+* 表示层  表示层向上对应用层提供服务，向下接收来自会话层的服务。表示层是为在应用过程之间传送的信息提供表示方法的服务，它关心的只是发出信息的语法与语义。确保一个系统的应用层发送的数据能被另一个系统的应用层识别
+* 会话层  会话层就是负责建立、管理和终止表示层实体之间的通信会话。在会话层及以上的高层次中，数据传送的单位不再另外命名，统称为报文。会话层不参与具体的传输，它提供包括访问验证和会话管理在内的建立和维护应用之间通信的机制。
+* 传输层   传输层建立了主机端到端的链接，传输层的作用是为上层协议提供端到端的可靠和透明的数据传输服务，包括处理差错控制和流量控制等问题。该层向高层屏蔽了下层数据通信的细节，使高层用户看到的只是在两个传输实体间的一条主机到主机的、可由用户控制和设定的、可靠的数据通路。我们通常说的，TCP UDP就是在这一层。端口号既是这里的“端”。
+* 网络层  确定分组从源端到目的端的路由选择。
+* 数据链路层 数据链路层(Data Link Layer)的任务是加强物理层的功能，使其对网络层显示为一条无错的线路。
+* 物理层  主要是处理机械的、电气的和过程的接口，以及物理层下的物理传输介质等。
+
+TCP/IP参考模型
+* 网络访问层（Network Access Layer）在TCP/IP参考模型中并没有详细描述，只是指出主机必须使用某种协议与网络相连。
+* 互联网层（Internet Layer）是整个体系结构的关键部分，其功能是使主机可以把分组发往任何网络，并使分组独立地传向目标。这些分组可能经由不同的网络，到达的顺序和发送的顺序也可能不同。高层如果需要顺序收发，那么就必须自行处理对分组的排序。互联网层使用因特网协议（IP，Internet Protocol）。TCP/IP参考模型的互联网层和OSI参考模型的网络层在功能上非常相似。
+* 传输层（Transport Layer）使源端和目的端机器上的对等实体可以进行会话。在这一层定义了两个端到端的协议：传输控制协议（TCP，Transmission Control Protocol）和用户数据报协议（UDP，User Datagram Protocol）。TCP是面向连接的协议，它提供可靠的报文传输和对上层应用的连接服务。为此，除了基本的数据传输外，它还有可靠性保证、流量控制、多路复用、优先权和安全性控制等功能。UDP是面向无连接的不可靠传输的协议，主要用于不需要TCP的排序和流量控制等功能的应用程序。
+* 应用层（Application Layer）包含所有的高层协议，包括：虚拟终端协议（TELNET，TELecommunications NETwork）、文件传输协议（FTP，File Transfer Protocol）、电子邮件传输协议（SMTP，Simple Mail Transfer Protocol）、域名服务（DNS，Domain Name Service）、网上新闻传输协议（NNTP，Net News Transfer Protocol）和超文本传送协议（HTTP，HyperText Transfer Protocol）等。TELNET允许一台机器上的用户登录到远程机器上，并进行工作；FTP提供有效地将文件从一台机器上移到另一台机器上的方法；SMTP用于电子邮件的收发；DNS用于把主机名映射到网络地址；NNTP用于新闻的发布、检索和获取；HTTP用于在WWW上获取主页。
+
+网络层由IPv4和IPv6协议处理，可以选择的传输层有TCP和UDP，除此之外网络应用还可以绕过传输层直接使用IPv4或IPv6，即`原始套接字`(raw socket)
+
+套接字提供由OSI的顶上3层到传输层的接口，原因1，顶上3层处理具体网络应用（FTP,Telnet,HTTP），的所有细节，底下4层处理所有通信的细节，发送数据，等待确认
+,给无序到达的数据排序，技术经验校验和等等。
+
+原因2：顶上3层通常构成所谓的用户进程（user process）,底下4层通常由操作系统内核的一部分提供。
+
+##### 传输层
+传输层包括TCP，UDP,SCTP流控制传输协议（Stream Control Transmission Protocol），SCTP是一个较新的协议，最初设计用于跨因特网传输电话信令。
+这些传输层协议都转而使用网络层协议IP。
+
+TCP提供客户和服务端的链接，先和特定的服务器建立连接，然后交换数据，最后终止这个连接。其次TCP提供可靠性，当TCP向一端发送数据时，它要求对端返回一个确认。
+如果没有收到确认，TCP会自动重传数据并等待更长时间。
+
+TCP有动态估算客户和服务器之间往返时间（round-trip time，RTT）的算法，以便它知道等待一个确认需要多少时间。因为RTT受网络流通各种变化影响，TCP还会持续估算一个给定连接的RTT.
+
+TCP通过给其中每个字节关联一个序号对所发送的数据进行排序。比如：应用发送2048字节到TCP套接字，TCP发送2给分节，第一个包含数据的序号1-1024，第二个是1025-2048，如果这
+些节点不是顺序到达，接收端TCP会先根据序号排序，再把数据传递给应用接收者。如果TCP收到重复数据，它还可以根据序号丢弃重复数据。
+TCP还提供流量控制。TCP总是告诉对端在任何时候它一次能够接收多少字节数据，这个称为通告窗口。在任何时候，该窗口指出接收缓冲区中当前可用的空间量，从而保证发送
+端发送的数据不会使缓冲区溢出。 该窗口时刻动态变化，当收到发端的数据时，窗口大小减小，当接收端应用程序从缓冲区读取时，窗口变大。
+
+TCP连接是全双工的。在单一字节流中的任何位置的字节发生丢失都将导致阻塞该连接上其后所有数据的传递，直到该丢失被修正。
+
+
+TCP的连接和终止：
+服务器必须准备好接收外来的连接，通常调用socket,bind和listen这3个函数来完成，即被动打开。
+* 第一次握手：客户端通过connect发起主动连接，发送SYN包(seq=x)到服务器，它告诉服务器将在（待建立的）连接中发送的数据的初始化序号，
+  通常SYN不携带数据，其所在ip数据包只包含一个首部，一个TCP首部及可能有的TCP选项，并进入SYN_SEND状态，等待服务器确认;
+* 第二次握手：服务器收到syn包，必须确认客户的SYN(ack=x+1)，同时自己也发送一个SYN包(seq=y)，即SYN+ACK包，此时服务器进入SYN_RECV状态
+  它包含服务器将在同一连接中发送的数据的初始化序号;
+* 客户端收到服务器的SYN+ACK包，向服务器发送确认包ACK(ack=y+1)，此包发送完毕，客户端和服务器进入ESTABLISHED状态，完成三次握手。
+
+
+TCP选项：
+
+每一个SYN可以包含多个TCP选项。
+* MSS选项。发送SYN的TCP一端使用本选项通告对端 它的最大分节（包）大小（maximum segment size）即MSS,也就是它在本连接的每个TCP分节中能够接受的最大数据量。
+  发送端TCP使用接收端的MSS值作为所发分节的最大大小。
+* 窗口规模选项 TCP连接任何能够通告对端的最大窗口大小是65535，因为在TCP首部中相应的字段占16位，然而在当今的高速网络连接中，需要更大的窗口来获得吞吐量
+  ，这个新选项指定TCP首部中的通告窗口必须扩大（即左移）的位数（0-14），所以最大的窗口接近1GB（65535 X 2^14）。使用该选项必须2端都支持。故只有在客户端
+  先发送的情况下，服务器才会发送该选项。
+
+* 时间戳选项 这个选项对高速网络连接是必须的，它可以防止由于失而复现的分组（并不是重传的）可能造成数据损坏。
+
+四次握手断开连接：
+* 第一次挥手：主动关闭方发送一个FIN，用来关闭主动方到被动关闭方的数据传送，也就是主动关闭方告诉被动关闭方：我已经不会再给你发数据了(当 然，在fin包之前
+  发送出去的数据，如果没有收到对应的ack确认报文，主动关闭方依然会重发这些数据)，但此时主动关闭方还可以接受数据。
+* 第二次挥手：被动关闭方收到FIN包后，发送一个ACK给对方，确认序号为收到序号+1(与SYN相同，一个FIN占用一个序号)。
+* 第三次挥手：被动关闭方发送一个FIN，用来关闭被动关闭方到主动关闭方的数据传送，也就是告诉主动关闭方，我的数据也发送完了，不会再给你发数据了。
+* 第四次挥手：主动关闭方收到FIN后，发送一个ACK给被动关闭方，确认序号为收到序号+1，至此，完成四次挥手。
+
+无论是客户端还是服务端，都可以主动执行关闭，通常情况下是客户端发起的，但是某些协议（HTTP/1.0）是由服务端主动执行关闭的。
+
+`Socket=Ip address+ TCP/UDP + port。`
+
+在每个TCP分节中都有16位的端口号和32位的IPv4地址。网际协议使用大端字节序（将高序字节存储在起始地址）来传送数据。
+
+为了执行网络I/O,一个进程必须要做的第一件事情就是调用socket函数，指定期望的通信协议类型（IPv4，IPv6,Unix域字节流协议等）。
+```
+int socket(int family, int type, int protocol);
+```
+* family 指明协议族，type 指明参数类型，protocol表示某个协议类型的常量值，或者设置为0，以选择系统的默认组合。
+
+```
+int connect(int sockfd, const struct sockaddr *servaddr, socklen_t addrlen)
+```
+* sockfd 又socket函数返回的套接字描述符，后面2参数分别是一个指向套接字地址结构的指针和该结构的大小。套接字地址结构必须包含服务器的Ip和端口号。
+
+客户端在调用connect函数前不必非得调用bind函数，如果有需要的话，内核会确定源IP地址，并选择一个临时端口作为源端口。
+
+bind函数把一个本地协议地址赋予一个套接字。对于网际协议，协议地址是32位的IPv4或128位的IPv6地址和TCP或者UDP端口号的组合。
+```
+int bind(int sockfd, const struct sockaddr *myaddr, socklen_t addrlen);// 成功返回0，错误返回-1
+```
+第2个参数是一个指向特定协议的地址结构的指针，第3个参数是该结构的长度。
+对于TCP，调用bind函数可以指定一个端口号，或者一个ip地址，也可以2者都指定，也可以都不指定。
+
+如果TCP客户端或者服务端启动后未调用bind绑定一个端口，当调用connect或listen时，内核就要为相应的套接字选择一个临时端口。让内核自动选择端口对于TCP客户端是
+常见的，对服务端确实罕见的。因为服务端是通过端口让大家所认识的。这个例外就是远程过程调用（RPC）服务器。它们通常是由内核临时选择一个端口，然后通过RPC
+端口映射器进行注册。
+
+进程可以把一个特定的ip地址绑定到它的套接字上，对于TCP客户端这就为在该套接字上发送IP数据报指派了源IP地址。
+
+listen函数仅由TCP服务器调用，它做2件事情:
+* 当socket函数创建一个套接字时，它被假设为一个主动套接字，即它是一个将调用connect发起连接的客户套接字。listen函数把一个未连接的套接字转换成一个被动套接字，
+  指示内核应接受指向该套接字的连接请求。
+* 第二个参数指定内核应该为相应套接字排队的最大连接数
+```
+int listen(int sockfd, int backlog)
+```
+该函数通常在socket和bind函数调用后再调用，并在accept函数之前调用。
+
+为了理解backlog参数，首先我们应该知道内核为任何一个给定的监听套接字维护2个队列（2队列和不超过backlog）：
+* 未完成连接队列，每个这样的SYN分节对应其中一项：已由某个客户发出并达到服务器，而服务器正在等待完成3次握手过程。这些套接字处于SYN_RCVD状态。
+* 已完成连接队列，每个已完成3次握手过程的客户对应其中一项，这些套接字处于ESTABLISHED状态。
+
+当进程调用accept函数时，已完成连接队列中的队头项将返回给进程，如果队列为空，进程将进入睡眠（假设套接字默认是阻塞方式），直到TCP在该队列中放入一项后才会被唤醒。
+
+accept函数由TCP服务器调用，用以从已完成连接的队列队头，返回下一个已完成连接。
+```
+int accept(int sockfd, struct sockaddt * cliaddr, socklen_t *addrlen)
+```
+后面2给参数用来返回已连接的对端进程（客户）的协议地址，addrlen是值-结果参数：
+
+如果accept成功，那么其返回值是由内核自动生成的一个全新描述符，代表和客户的TCP连接。
+
+fork函数：该函数调用一次，返回2次。它在调用进程（父进程）中返回一次，返回中是新派生进程（子进程）的进程ID号；在子进程中又返回一次，返回中为0，
+故返回值本身告知当前进程是子进程还是父进程。
+```
+pid_t fork(void);// 返回：在子进程中为0，父进程中为子进程ID，出差返回-1
+```
+fork在子进程返回0，而不是父进程ID的原因在于：任何子进程只有一个父进程，并且子进程总是可以通过调用getppid取得父进程的进程ID。
+相反，父进程可以有许多子进程然而却无法获得各子进程的ID，即父进程需要跟踪子进程的ID,那么它必须要记录每次fork后的返回值。
+
+父进程在调用fork之前打开的所有描述符在fork返回后由子进程分享。例：网络服务器 父进程调用accept之后fork。所接受的已连接套接字随后就在子进程和父进程之间
+共享，通常情况下，子进程接着读写这个套接字，父进程则关闭这个套接字。
+
+fork2种典型用法：
+*  一个进程创建一个自身副本，这样每一个副本都可以在另一个副本执行其他任务的同时处理各自的某个操作。
+* 一个进程想要执行另一个程序，既然创建新进程的唯一办法是fork,该进程于是会先调用fork创建一个自身的副本，然后其中一个副本（通常为子进程）调用exec把
+  自身替换成新的程序。
+
+放在硬盘上的可执行文件能够被unix执行的唯一方法是：由一个现有进程调用6个exec函数中的某一个，exec把当前进程映像替换为新的程序文件，而且该程序通常从
+main函数开始执行。进程ID并不改变。
+
+在Linux中，并不存在一个exec()的函数形式，exec指的是一组函数，一共有6个，分别是：
+```
+#include <unistd.h>
+extern char **environ;
+int execl(const char *path, const char *arg, ...);
+int execlp(const char *file, const char *arg, ...);
+int execle(const char *path, const char *arg, ..., char *const envp[]);
+int execv(const char *path, char *const argv[]);
+int execvp(const char *file, char *const argv[]);
+int execve(const char *path, char *const argv[], char *const envp[]);
+```
+其中只有execve是真正意义上的系统调用，其它都是在此基础上经过包装的库函数。
+
+每个文件或者套接字都有一个引用计数，引用计数在文件表项中维护，它是当前打开着的引用该文件或套接字的描述符的个数。fork后描述符在子进行和父进程间共享
+其文件表项的引用计数将会加1，当父进程关闭套接字连接时，计数减1，该套接字真正的清理和资源释放要等到引用计数为0时才会发生。
+
+close函数关闭套接字，并终止TCP连接。
+```
+int close(int sockfd)
+```
+
+close一个TCP套接字的默认行为是把该套接字标记为已关闭，然后立即返回给调用程序。该套接字描述符不能再由调用进程使用,然而TCP将尝试发送以等待数据的，发送完毕后发送TCP终止序列。
+
+##### I/O复用 select 和 poll函数
+Unix下5种I/O模型
+* 阻塞式I/O
+* 非阻塞式I/O
+* I/O复用 （select和poll）
+* 信号驱动I/O（SIGIO）
+* 异步I/O(POSIX的aio_系列函数)
+
+select函数：
+```
+int select(int maxfdp, fd_set *readset, fd_set *writeset, fd_set *exceptset,const struct timeval *timeout);
+
+struct timeval
+{
+    long tv_sec;   /*秒 */
+    long tv_usec;  /*微秒 */
+};
+```
+该函数允许进程指示内核等待多个事件中的任何一个发生，并只在有一个或多个事件发生或经历一段指定时间后才唤醒它。
+
+* timeout:用于设置select函数的超时时间，即告诉内核select等待多长时间之后就放弃等待。
+  这个参数有3种可能结果：
+  * 永远等待下去： 仅在有一个描述符准备好I/O时才返回，为此把参数设置为空指针（NULL）。当所指定的描述符中的已准备好或捕捉到一个信号则返回。如果捕捉到一个信号，则 select 返回 -1，errno 设置为 EINTR。
+  * 等待一段固定时间：在有一个描述符准备好I/O时才返回，都是不超过该参数设置的超时时间。
+  * 根本不等待：检查描述符后立即返回，即轮询（polling),为次该参数设置为0。
+* readfds、writefds、exceptset：分别指向可读、可写和异常等事件对应的描述符。
+* maxfdp：被监听的文件描述符的总数，它比所有文件描述符集合中的文件描述符的最大值大1，因为文件描述符是从0开始计数的；
+
+
+这 3 个描述符集说明了我们关心的可读、可写或处于异常条件的描述符集合。每个描述符集存储在一个 `fd_set` 数据类型中。
+```
+void FD_CLR(int fd, fd_set *fdset);  //调用 FD_CLR 可以清除一位
+int  FD_ISSET(int fd, fd_set *fdset);//调用 FD_ISSET 测试描述符集中的一个指定位是否已打开
+void FD_SET(int fd, fd_set *fdset);// 要开启描述符集中的一位，可以调用 FD_SET
+void FD_ZERO(fd_set *fdset); // 调用 FD_ZERO 将一个 fd_set 变量的所有位设置为 0
+```
+在声明了一个描述符集之后，必须用 FD_ZERO 将这个描述符集置为 0，然后在其中设置我们关心的各个描述符的位
+```
+fd_set rset;
+int fd;
+FD_ZERO (&rset);// 初始化描述符集
+FD_SET (1, &rset);// 打开描述符1对应的位
+FD_SET (7, &rset);// 打开描述符7对应的位
+```
+从 select 返回时，可以用 FD_ISSET 测试该集中的一个给定位是否仍处于打开状态。
+
+返回值
+* 负值，select 错误；
+* 正值，某些文件可读、写或异常；
+* 0，等待超时，没有可读、写或异常的文件
+```
+void str_cli(FILE *fp, int sockfd){
+  int maxfdp1;// 描述符的最大值大1
+  fd_set rset;
+  char sendline[MAXLINE], recvline[MAXLINE];
+
+  FD_ZERO(&rset);
+  for(;;){
+    FD_SET(fileno(fp),&rset);
+    FD_SET(sockfd, &rset);
+    maxfdp1 = max(fileno(fp),sockfd) + 1;
+    Select(maxfdp1, &rest, NULL, NULL, NULL);
+    if(FD_ISSET(sockfd, &rset)){
+      // ...
+    }
+    if(FD_ISSET(fileno(fp), &rset)){
+      // ...
+    }
+  }
+}
+```
+Select函数实现原理：
+支持阻塞操作的设备驱动通常会实现一组自身的等待队列，如读/写等待队列，用于支持上层(用户层)所需的BLOCK或NONBLOCK操作。
+当应用程序通过设备驱动访问该设备时(默认为BLOCK操作)，若该设备当前没有数据可读或写，则将该用户进程插入到该设备驱
+动对应的读/写等待队列让其睡眠一段时间，等到有数据可读/写时再将该进程唤醒。
+
+select就是巧妙的利用等待队列机制让用户进程适当在没有资源可读/写时睡眠，有资源可读/写时唤醒。
+
+select 会循环遍历它所监测的 fd_set 内的所有文件描述符对应的驱动程序的 poll 函数。驱动程序提供的 poll 函数首先会将调用
+select 的用户进程插入到该设备驱动对应资源的等待队列(如读/写等待队列)，然后返回一个 bitmask 告诉 select 当前资源哪些可用。
+当 select 循环遍历完所有 fd_set 内指定的文件描述符对应的 poll 函数后，如果没有一个资源可用(即没有一个文件可供操作)，则
+select 让该进程睡眠，一直等到有资源可用为止，进程被唤醒(或者timeout )继续往下执行。
+
+进入睡眠状态是在do_select内调用schedule_timeout(__timeout)实现的。当select遍历完fd_set内的所有设备文件，发现没有文件可操
+作时(即retval=0),则调用schedule_timeout(__timeout)进入睡眠状态。唤醒该进程的过程通常是在所监测文件的设备驱动内实现的，驱
+动程序维护了针对自身资源读写的等待队列。当设备驱动发现自身资源变为可读写并且有进程睡眠在该资源的等待队列上时，就会唤醒这个资源等待队列上的进程。
+
+
+函数 pselect
+
+select 的超时值用 timeval 结构指定，但 pselect 使用 timespec 结构。timespec 结构以秒和纳秒表示超时值，而非秒和微妙。
+pselect 可使用可选信号屏蔽字。若 sigmask 为 NULL，那么在与信号有关的方面，pselect 的运行状况和 select 相同。否则，
+sigmask 指向一信号屏蔽字，在调用 pselect 时，以原子操作的方式安装该信号屏蔽字。在返回时，恢复以前的信号屏蔽字。
+```
+int pselect(int maxfdp1, fd_set *readfds, fd_set *writefds,fd_set *exceptfds, const struct timespec *timeout,const sigset_t *sigmask);
+```
+pselect增加了第6个参数，一个指向信号掩码的指针。该参数允许程序先禁止递交某些信号，再测试由这些当前被禁止的信号的信号处理函数设置的全局变量
+,然后调用pselect,告诉它重新设置信号掩码。
+
+
+函数 poll
+```
+int poll(struct pollfd *fdarray, unsigned long nfds, int timeout);
+返回值：准备就绪的描述符数目；若超时，返回 0；若出错，返回 -1.
+```
+与 select 不同，poll 不是为每个条件（可读性、可写性和异常条件）构造一个描述符集，而是构造一个 pollfd 结构的数组，每个数组元素都是一个pollfd结构,
+用于指定测试某个给定描述符fd的条件。fdarray 数组中的元素数由 nfds 指定。
+```
+struct pollfd {
+     int   fd;         /* file descriptor */
+     short events;     /* requested events-等待的需要测试事件 */
+     short revents;    /* returned events-实际发生了的事件，也就是返回结果 */
+ };
+```
+要测试的条件由events 成员指定，函数在相应的revents成员中返回该描述符的状态。每个描述符都有2个变量，一个是调用值，另一个是返回结果，从而避免使用值-结果参数。
+
+poll 的最后一个参数指定的是我们愿意等待多长时间。如同 select 一样，有 3 种不同的情形。
+* timeout == -1 永远等待。（某些系统在 <stropts.h>中定义了常量 INFTIM，其值通常是 -1）当所指定的描述符中的一个已准备好，或捕捉到一个信号时返回。如果捕捉到一个信号，则 poll 返回 -1，errno 设置为 EINTR。
+* timeout == 0 不等待。测试所有描述符并立即返回。这是一种轮询系统的方法，可以找到多个描述符的状态而不阻塞 poll 函数。
+* timeout > 0 等待 timeout 毫秒。当指定的描述符之一已准备好，或 timeout 到期时还没有一个描述符准备好，则返回值是 0.（如果系统不提供毫秒级精度，则 timeout 值取整到最近的支持值）。
+
+poll函数可用的测试值
+|常量|说明|
+|:----:|:-----:|
+|POLLIN|普通或优先级带数据可读|
+|POLLRDNORM|普通数据可读|
+|POLLRDBAND|优先级带数据可读|
+|POLLPRI|高优先级数据可读|
+|以上为输入的4常量||
+|POLLOUT|普通数据可写|
+|POLLWRNORM|普通数据可写|
+|POLLWRBAND|优先级带数据可写|
+|以上为处理输出的3个常量||
+|POLLERR|发生错误|
+|POLLHUP|发生挂起|
+|POLLNVAL|描述字不是一个打开的文件|
+|以上为处理错误的3常量||
+
+例如`fds[0].events = POLLIN;` /*将测试条件设置成普通或优先级带数据可读*/，
+然后 `int pollresult = poll(fds,xx,xx);` //这样就可以监听fds里面文件描述符了，当满足特定条件就返回，并将结果保存在revents中。
+
+poll识别3类数据，普通，优先级带，高优先级。
+
+就TCP和UDP套接字而言，以下条件引起poll返回特定的revent。不幸的是，POSIX在其poll中的定义留了许多空洞（即有多种方法返回相同的条件）
+* 所有正规的TCP和UDP数据都被认为是普通数据。
+* TCP连接读半部关闭时（收到对端的FIN），也被认为是普通数据，随后读操作返回0。
+* TCP连接存在错误既可以认为是普通数据，也可以认为是错误（POLLERR）。无论哪种情况随后读 都将返回-1，并把errno设置为合适的值，
+  这可以用于处理接收到RST或者发生超时等条件。
+* 在监听套接字上有新连接可用即可认为是普通数据，也可以认为是优先级数据，大多数视为普通数据。
+* 非阻塞式connect的完成被认为是使相应套接字可写。
+
+UDP常见的应用程序：DNS（域名系统），NFS（网络文件系统） SNMP(简单网络管理协议)。
+
+UDP实现：sendto()，是把UDP数据报发给指定地址；recvfrom()是从指定地址接收UDP数据报。
+```
+int sendto (int s, const void *buf, int len, unsigned int flags, const struct sockaddr *to, int tolen);
+int recvfrom(int s, void *buf, int len, unsigned int flags, struct sockaddr *from, int *fromlen);
+```
+* s：      socket描述符。
+* buf：    UDP数据报缓存地址。
+* len：    UDP数据报长度。
+* flags：  该参数一般为0。
+* to：     指向一个含有数据报接收者的协议地址（例如IP和端口）的套接字地址结构，大小由tolen指定，指明UDP数据发往哪里报。
+* tolen：  对方地址长度，一般为：sizeof(struct sockaddr_in)。
+* fromlen：recvfrom()函数参数，struct sockaddr_in类型，指明从哪里接收UDP数据报
+
+函数把所读写数据的长度作为函数返回值。
+
+
+##### 域名系统
+域名系统（Domain Name System）主要用于主机名称和IP地址间的映射。DNS中的条目称为资源记录（resource record,RR）。RR类型如下：
+* A A记录把一个主机名映射成一个32位的IPv4地址。
+* AAAA “4A”（quad A）记录AAAA记录把一个主机名映射成一个128位的IPv6地址。“4A”来自地址长度相差4倍。
+* PTR 称为指针记录，把IP地址映射成主机名。对于IPv4，32位地址的4给字节反转顺序，每个字节转成各自的十进制值后，在加上in-addr.arpa,结果字符串用于PTR查询，
+  对于IPv6地址，128位地址中的32个4位先反转顺序，每个4位组转成16进制，ASCII码，再加上ip.arpa。
+* MX MX记录把一个主机作为指定主机的“邮件交换器”
+* CHNAME 代表“canonical name”(规范名字)，他常见的用法是为常用的服务指定CHNAME记录（比如ftp,www）。
+  `ftp   IN   CHNAME   xxx.xxx.com`
+  `www   IN   CHNAME   xxx.xxx.com`
+
+
+#### 第二版
+IPC（Inter-Process Communication，进程间通信），传统上术语描述是运行在某个操作系统之上的不同进程间的*消息传递*(message passing)的方式。
+在Unix操作系统的演变中，消息传递经历了如下发展阶段：
+* 管道（pipe）是第一个广泛使用的IPC形式，既可以在程序中使用，也可以从shell中使用。管道的问题在于：它只能在具有共同祖先（父子进程关系）的的进程中使用。
+   不过该问题已随有名管道即FIFO的引入而绝决。
+* System V消息队列（System V message queue） 它们可用在同一主机有亲缘或者无亲缘关系进程之间。
+
+
+

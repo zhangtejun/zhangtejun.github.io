@@ -44,9 +44,14 @@ p12: "/assets/p12.gif"
 p13: "/assets/p13.gif"
 dispatcher: "/assets/dispatcher.png"
 sf1: "/assets/sf1.png"
+tree1: "/assets/tree1.jpg"
+tree2: "/assets/tree2.jpg"
+tree3: "/assets/tree3.jpg"
+tree4: "/assets/tree4.png"
 
 #download
 notepad: "/download/Notepad++.zip"
+Araxis: "/download/Araxis++.zip"
 
 # Build settings
 markdown: kramdown
