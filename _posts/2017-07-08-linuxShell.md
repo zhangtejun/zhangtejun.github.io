@@ -143,10 +143,13 @@ root@zhtjun:/usr/bin# which passwd
 /usr/bin/passwd
 root@zhtjun:/usr/bin# ls -l /usr/bin/passwd 
 -rwsr-xr-x 1 root root 51096 May 26  2012 /usr/bin/passwd
+
+# 设置SUID要保证文件同时拥有所有者的可执行（x）权限，否则会出现一个大写的S,这是不正常的
+-rwSr-xr-x 1 root root 51096 May 26  2012 a.sh
 ```
 上面的s就是SUID,SUID是set uid的缩写。SUID仅对可执行二进制文件起作用。
 
-SUID的作用：其他账户在执行时具有文件所有者的权限。chmod u+s sh.sh
+SUID的作用：其他账户在执行时具有文件所有者的权限。chmod u+s sh.sh / chmod u+4777 sh.sh
 
 简单理解：执行password命令就是执行/usr/bin/passwd，而/usr/bin/passwd有SUID属性并且所有者是root,那么其他账户执行password
 时，就临时具有和root账户一样的权限，将加密后的密码写入文件/etc/shadow。
@@ -165,13 +168,13 @@ root@zhtjun:/usr/bin# ls -l |grep '^...s'
 -rwsr-sr-x 1 root   root      14264 May  7  2013 X
 ```
 
-SGID是set gid的缩写。即其他账户执行时具有文件所属组的权限。
+SGID是set gid的缩写。即其他账户执行时具有文件所属组的权限。chmod g+s sh.sh / chmod 2777 folder
 
 设置SGID和SUID属性时需要确保目录或文件对于所属组有执行权限。如果没有会看见大写的S。这是不正常的。需要增加相应权限就正常。
 
 **粘滞位**也就SBIT，是sticky bit的缩写。只有目录才可以设置该属性。可以理解为防删除位。
 作用是：在一个大家都具有权限的目录下，某个账号不能随便删除别人的文件或目录。
-增加SBIT属性：chmod o+t folder
+增加SBIT属性：chmod o+t folder/chmod +t folder  / chmod 1777 folder
 
 ##### alias,unalias
 设置别名：`alias 别名=值`
@@ -263,8 +266,8 @@ root@zhtjun:~#
 root@zhtjun:~# pwd;ps
 /root
   PID TTY          TIME CMD
-14522 pts/0    00:00:00 bash #当前shell的进程id
-15225 pts/0    00:00:00 ps   #命令ps的进程id
+14522 pts/0    00:00:00 bash #当前shell的进程id 14522
+15225 pts/0    00:00:00 ps   #命令ps的进程id 15225
 root@zhtjun:~# (pwd;ps)
 /root
   PID TTY          TIME CMD
@@ -296,7 +299,7 @@ zhangtejun@zhangtejun-pc:~$ a="hello world"
 zhangtejun@zhangtejun-pc:~$ a=$A_world     #将变量A_world赋值给a
 zhangtejun@zhangtejun-pc:~$ a=${A}_world   #将变量A和_world拼接后赋值给a
 ```
-大括号扩展功能：
+大括号除了可作为变量的定界符，还有扩展功能：
 ```shell
 root@zhtjun:~# echo a{d,c,b{x,y,zz}}e
 root@zhtjun:~# ade ace abxe abye abzze
