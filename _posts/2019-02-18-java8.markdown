@@ -17,6 +17,15 @@ Java 8是在2014年3月发布,Java 8提供了一个新的API（称为“流”�
 Java 8中加入默认方法主要是为了支持库设计师，让他们能够写出更容易改进的接口。给接口设计者提供了一个扩充接口的方式，而不会破坏现有的代码。Java 8在接口声明
 中使用新的default关键字来表示这一点。
 
+接口的静态方法：
+Iterable 接口中也新增了一个默认方法：forEach，该方法功能和 for 循环类似，但是允许 用户使用一个 Lambda 表达式作为循环体。
+forEach 方法不能保证元素是 按顺序处理的。如果需要保证按顺序处理，应该使用 forEachOrdered 方法。
+
+比如，你可能希望使用 TreeSet，而不是由框架在背后自动为你指定一种类型的 Set。此时就可以使用 toCollection，它接受一个函数作为参数，
+来创建集合。使用 toCollection，用定制的集合收集元素
+```java
+stream.collect(toCollection(TreeSet::new));
+```
 
 ##### Comparator与Comparable用法与区别
 * Comparable  
@@ -177,7 +186,7 @@ inventory.sort(Comparator.comparing(Apple::getColor).thenComparing(Apple::getWei
      那么你就可以写expensiveTransaction::getValue）。
 
 ###### 谓词复合
-谓词接口包括三个方法：negate、and和or，让你可以重用已有的Predicate来创建更复杂的谓词。
+谓词接口包括三个方法：negate、and和or，让你可以重用已有的Predicate(接受一个对象，返回一个布尔值)来创建更复杂的谓词。
 `a.or(b).and(c)可以看作(a || b) && c`  
 组合谓词，表达要么是重（150克以上）的红苹果，要么是绿苹果：
 ```java
@@ -402,7 +411,138 @@ public static long parallelSum(long n) {
 }
 ```
 
+##### 外部迭代
+for 循环其实是一个封装了迭代的语法糖，我们在这里多花点时间， 看看它的工作原理。首先调用 iterator 方法，产生一个新的 Iterator 对象，
+进而控制整 个迭代过程，这就是外部迭代。迭代过程通过显式调用 Iterator 对象的 hasNext 和 next 方法完成迭代。
 
 
+##### 数据分块
+收集器 partitioningBy，它接受一个流，并将其分成两部分，它使用 Predicate 对象判断一个元素应该属于哪个部分，并根据布尔值返回一 个 Map 到列表。
+因此，对于 true List 中的元素，Predicate 返回 true；对其他 List 中的 元素，Predicate 返回 false。
 
+##### 数据分组
+数据分组是一种更自然的分割数据操作，与将数据分成 true 和 false 两部分不同，可以使 用任意值对数据分组。
 
+使用 map 操作提取出name，Collectors.joining 收集流中的值，该方法可以方便地从一个流得到一个字符串，允许用户提供`分隔符（用以分隔元素）`、`前缀`和`后缀`。
+```java
+String result = artists.stream() .map(Artist::getName) .collect(Collectors.joining(", ", "[", "]"));
+```
+
+1. putIfAbsent 原有的put方法，是当Key存在时则替换；而putIfAbsent方法，则是当存在Key时，忽略Put操作不更新Value
+```java
+// putIfAbsent
+  Map<String, Object> map = new HashMap<>();
+  map.put("A", "Tom");
+  map.put("AA", "Tom");
+  Object d =  map.put("C", "Lily");
+  Object d1 =  map.put("C", "Lily1");
+  // 1. 原有的put方法，是当Key存在时则替换；而putIfAbsent方法，则是当存在Key时，忽略Put操作不更新Value
+  Object d2 = map.putIfAbsent("A","132");
+  Object d3 = map.putIfAbsent("D", "132");
+  System.out.println(d+":"+d1+":"+d2+":"+d3); // null:Lily:Tom:null
+  map.forEach((k,v) -> System.err.println(k+" : "+v.toString()));
+  /*
+    AA : Tom
+    A : Tom（已存在返回旧值，不更新当前值））
+    C : Lily1（已存在返回旧值，更新当前值）
+    D : 132
+    */
+```
+
+2. replace 覆盖掉已有key的value
+```java
+  Map<String, Object> map = new HashMap<>();
+  map.put("A", "Tom");
+  map.put("AA", "Tom");
+  map.put("C", "Lily");
+  map.put("C", "Lily1");
+
+  //2. replace方法，覆盖掉已有key的value
+  Object re = map.replace("B", "new JAK"); // key 不存在，则忽略 返回null
+  Object re1 = map.replace("AA", "new Tom");// 执行替换 返回旧值
+  boolean b = map.replace("A", "Tom", "new");//此时必须传入老value，否则覆盖不成功  返回true
+  boolean b1 = map.replace("C", "new Lily", "new");//此时必须传入老value有误，覆盖不成功 返回false
+
+  StringJoiner sj = new StringJoiner(":","[","]");
+  sj.add(re + "").add(re1 + "").add(Boolean.toString(b)).add(Boolean.toString(b1));
+  System.out.println(sj.toString());
+  map.forEach((k,v) -> System.err.println(k+" : "+v.toString()));
+  /**
+   [null:Tom:true:false]
+   AA : new Tom
+   A : new  // 覆盖成功
+   C : Lily1 // 覆盖失败
+   */
+
+```
+
+3. merge
+```java
+
+  Map<String, Object> map = new HashMap<>();
+  map.put("A", "Tom");
+
+  // 3. A: 如果指定key不存在，相当于put(k,v)
+  //    B: 指定key已存在，可以进行一些合并操作，
+  Object re = map.merge("E", "e", (oldV, newV) -> "1");// E不存在，E=e 相当于put(E,e)
+  Object re1 = map.merge("A", "a", (oldV, newV) -> oldV.toString() + newV);//A存在，A=Toma
+  // F存在：3.2.1 以某种方式合并两者(oldV,newV) ->newV.toString()+oldV)
+  //        3.2.2 (oldV,newV) ->oldV 保留旧值
+  //        3.2.3 (oldV,newV) ->newV 保留新值
+  //        3.2.4 (oldV,newV) ->null 删除旧值
+  Object re2 = map.merge("F","f",(oldV,newV) ->newV.toString()+oldV);
+
+  StringJoiner sj = new StringJoiner(":","[","]");
+  sj.add(re + "").add(re1 + "");
+  System.out.println(sj.toString());
+  map.forEach((k,v) -> System.err.println(k+" : "+v.toString()));
+```
+
+4. compute相当于put,只不过返回的是新值
+```
+Map<String, Object> map = new HashMap<>();
+map.put("A", "Tom");
+map.put("AA", "Tom");
+
+// 4.相当于put,只不过返回的是新值
+Object aab = map.compute("AAB", (k, v) -> v+k); // 集合中并不包含AAB,当key不存在时，执行函数,更新value 并返回结果 nullAAB
+Object a = map.compute("AA", (k, v) -> v);// 返回value Tom   执行函数,更新value,并返回结果
+Object b = map.compute("AAA", (k, v) -> k);// 返回key AAA 执行函数,更新value,并返回结果
+
+StringJoiner sj = new StringJoiner(":","[","]");
+sj.add(aab + "").add(a + "").add(b+"");
+System.out.println(sj.toString());
+map.forEach((k,v) -> System.err.println(k+" : "+v.toString()));
+```
+
+5. 相当于put 存在时返回存在的值，不存在时返回新值
+```
+Map<String, String> map = new HashMap<>();
+map.put("a","A");
+map.put("b","B");
+String vv = map.computeIfAbsent("b",k->"v");  // 输出 B
+String v1 = map.computeIfAbsent("c",k->"v"); // 输出 v
+map.forEach((k,v) -> System.err.println(k+" : "+v.toString()));
+/**
+ a : A
+ b : B
+ c : v
+ */
+```
+
+6. 在map中已经存在的key的value进行操作。只对已经存在key的进行操作
+```java
+HashMap<String,Integer> map = new HashMap<>();
+map.put("1",1);
+map.put("2",2);
+map.put("3",3);
+//只对map中存在的key对应的value进行操作
+Integer integer = map.computeIfPresent("3", (k,v) -> v+1 );
+Integer integer1 = map.computeIfPresent("4", (k,v) -> {
+    if (v==null)return 0;
+    return v+1;
+} );
+System.out.println(integer);// 4
+System.out.println(integer1);// null
+System.out.println(map);// {1=1, 2=2, 3=4}
+```

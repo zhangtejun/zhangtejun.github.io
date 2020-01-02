@@ -12,6 +12,8 @@ categories: SpringCloud
 * 服务租约（renew）
 * 服务剔除（evict）
 
+Eureka主要是维护服务列表并自动检查他们的状态。
+
 LeaseManager是Eureka关于服务发现定义的写操作接口，LookupService是定义查询相关的操作方法，主要用于client。
 ```java
 public interface LeaseManager<T> {
@@ -1006,7 +1008,7 @@ zuul:
 >多实例路由
 >>默认会使用Eureka中集成的负载均衡功能，如果想要使用Ribbon提供的负载均衡功能，就需要指定一个serviceId,此操作需要禁止Ribbon使用Eureka。
 
->forward本地跳转,client1为zuul-server的mapping
+>forward本地跳转(跳转路由 SendForwardFilter),client1为zuul-server的mapping
 ```yaml
 zuul:
        prefix: /pre #指定前缀
@@ -1107,6 +1109,15 @@ Zuul一共有4种生命周期的Filter：
 * post 这类Filter在源服务返回结果或者异常信息发生后执行的，如果需要对返回信息做一些处理，则在此类Filter进行处理。
 * error 整个生命周期内如果发送异常，则会进入error Filter,可作为全局异常处理。
 
+路由配置
+>简单路由 SimpleHostRoutingFilter 会将HTTP请求全部转发到“源服务”（的HTTP）,使用HttpClient进行转发，将HttpServletRequest
+>的相关数据（参数，请求头等）转换为HttpClient的请求实例，再使用CloseableHttpClient进行转发。
+>>要触发简单路由，需要配置的url以http或者https开头。
+
+>自定义路由 在配置类中创建一个 PatternServiceRouteMapper bean即可
+
+
+
 Zuul 原生Filter
 >Zuul Server 如果使用@EnableZuulProxy注解搭配Springboot Actuator,会多2个管控端点。
 >>/routes  返回所有已生成的映射规则
@@ -1119,9 +1130,32 @@ Zuul 原生Filter
 自定义Filter
 >只需要继承ZuulFilter即可，ZuulFilter是一个抽象类，有如下方法需实现：
 >>String filterType(): 使用返回值设定Filter类型，可以设置为pre,route,post,error类型。
->>int filterOrder(): 设置Filter的执行顺序
+>>int filterOrder(): 设置Filter的执行顺序 提供一个int值，值越小优先级越大
 >>boolean shouldFilter： 设置该Filter是否执行，可以作为开关使用
 >>Object run()： 核心执行逻辑，业务处理等操作
+
+
+
+##### Header
+* 敏感Header的设置：一般来说，可在同一系统中的服务之间共享Header.不过应尽量防止让一些敏感的Header外泄。因此，在很多场景下，需要通过为路由指定一系列敏感Header列表。
+```
+zuul:
+  routes:
+    users:
+      path: /test/**
+      sensitiveHeaders: Cookie,Set-Cookie,Authorization
+      url: http://localhost:8000
+```
+* 忽略Header 使用zuul.ignoredHeaders属性丢弃一些Header
+```
+zuul
+  ignoredHeaders: cache-control,content-length
+```
+
+##### 请求上下文
+HTTP请求的全部信息都封装在一个RequestContext对象中，该对象继承ConcurrentHashMap，RequestContext维护当前线程的全部请求变量，例如请求的URI,serviceId,主机
+信息等。
+
 
 ##### 鉴权
 1. 加入pom.xml依赖
@@ -1146,10 +1180,16 @@ Zuul 原生Filter
 **漏桶**
 可以认为就是注水漏水过程，桶以一定速率流出水，以任意速率（入大于出）流入水，当水超过桶流量则丢弃，因为桶容量是不变的，保证了整体的速率。
 当在入小于出的情况下，漏桶则不起作用。溢出的流量可以被利用起来，比如放到一个队列里，做流量排队。
+
+基本思想：利用一个缓冲区，当有请求进入系统时，无论请求的速率如何，都先在缓冲区保存，然后以固定的流速流出缓冲区进行处理。
+
+漏桶的容积和流出速率是2个重要的参数。
+
+
 **令牌桶**
 1. 所有的请求在处理之前都需要拿到一个可用的令牌才会被处理；
 2. 根据限流大小，设置按照一定的速率往桶里添加令牌；
-3. 桶设置最大的放置令牌限制，当桶满时、新添加的令牌就被丢弃活着拒绝；
+3. 桶设置最大的放置令牌限制，当桶满时、新添加的令牌就被丢弃或者拒绝；
 4. 请求达到后首先要获取令牌桶中的令牌，拿着令牌才可以进行其他的业务逻辑，处理完业务逻辑之后，将令牌直接删除；
 5. 令牌桶有最低限额，当桶中的令牌达到最低限额的时候，请求处理完之后将不会删除令牌，以此保证足够的限流；
 6. 由于令牌桶中有一定流量，那么就有可能存在一定程度上的流量突发。
