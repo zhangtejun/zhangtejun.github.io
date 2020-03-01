@@ -717,6 +717,57 @@ Good
 Good
 ```
 
+
+awk支持2种不同的变量，内建变量和自定义变量
+* 内建变量（预定义变量）
+  1. $n 当前记录的第n个字段，比如n为2标识第二个字段
+  2. $0 这个变量包含执行过程中当前行的文本内容
+  3. FILENAME 当前输入的文件名
+  4. FS 字段分隔符（默认是空格）
+  5. NF 表示字段数，在执行过程中对应当前字段数，NF：列的个数
+  6. FNR 各文件分别计数的行号
+  7. NR 表示记录数，相当于行号
+  8. OFS 输出字段分隔符 默认空格
+  9. ORS 输出记录分隔符 默认换行符
+  10. RS 记录分隔符 默认换行符
+
+* 常用命令选项
+  1. -F 指定分隔符
+  2. -v 赋值一个用户自定义变量
+  3. -f 指定脚本文件，从脚本中读取awk命令
+
+
+```shell
+# 输出 BB
+echo "AA BB CC" | awk '{print $2}' # 默认空格分隔符
+echo "AA BB CC" | awk -F " " '{print $2}' # 指定空格分隔符 -F和分隔符之间可以有空格
+echo "AA BB CC" | awk -F" " '{print $2}' # 指定空格分隔符
+
+echo "AA,BB,CC" | awk -F,   '{print $2}' # 指定逗号分隔符
+echo "AA,BB,CC" | awk -F ,   '{print $2}' # 指定逗号分隔符
+echo "AA,BB,CC" | awk -F","   '{print $2}' # 指定逗号分隔符
+echo "AA,BB,CC" | awk -F ","   '{print $2}' # 指定逗号分隔符
+
+# 输出c3
+echo "A1b2c3" | awk -F "b2"   '{print $2}' # 指定b2分隔符
+echo "A1b2c3" | awk  'BEGIN {FS="b2"} {print $2}'# 使用FS指定b2分隔符，FS的值 必须是双引号
+```
+
+**关系运算符**
+```shell
+echo "1 2 3 " > a.txt
+awk '{print $1+10}' a.txt  # => 11
+
+# 取最后一列
+awk '{print $NF}' a.txt  # => 3
+awk '{print $3}' a.txt  # => 3
+
+# 取倒数第二列
+awk '{print $(NF-1)}' a.txt  # => 2
+
+
+```
+
 ##### awk支持正则表达式
 格式： awk '查找模式 [命令]' 文件名
 
