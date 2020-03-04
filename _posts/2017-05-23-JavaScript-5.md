@@ -363,6 +363,79 @@ ECStack = [
 ];
 ```
 
+#### js正则
+
+```js
+var str = "121tg32";
+// 第一种方式
+var reg = /tg/;
+reg.test(str); // ture /false
+
+// 第二种
+var reg2 = new RegExp("tg");
+reg2.test(str); // ture /false
+reg2.exec(str); // 返回数组 匹配的结果
+
+```
+
+```js
+var str = "121tg32";
+// 第一种方式
+var reg = /t{1}/; //匹配1个t
+var reg = /t{n}/; //匹配2个连续的t
+var reg = /t{n}/; //匹配n个连续的t
+var reg = /t{m,n}/; //匹配n个连续的或者m个t,同时满足的情况下，会匹配多的那个(m<n,同时满足，则匹配n)
+var reg = /t{m,}/; //匹配m个及以上的t
+
+* 表示0次或者多次，等同于{0，}，即c* ===> c{0,}
++ 表示1次或者多次，等同于{1，}，即c+ ===> c{1,}
+？表示1次或者0次，等同于{0,1}，即c? ===> c{0,1}
+
+正则默认是贪婪模式，即尽可能多的匹配，
+var str = "121tg4tllltt32";
+var reg = /t{1,2}/; // 结果将是匹配2个连续t
+如果希望尽可能少的匹配，可以加上？即{m,}? , *? , +? , ?? , {m,n}?
+var reg = /t{1,2}?/; // 结果将是匹配1个连续t
+
+/^ $/
+^ 表示以什么开头，$表示以什么结尾
+/./点会匹配除换行符之外的所有字符
+正则要求字符串不能以换行符开头
+
+/a|b/ 匹配a或者b
+/^b|c.+/  匹配以b开头 或者匹配c.+
+/^(b|c).+/  匹配以b或者c 以及其后所有非换行符合
+/[abc]/  匹配a或者b或者c中的任意一个字符
+
+\b 边界
+var reg = /\bc/; // 匹配字符串左右边界是否是c
+\B 非边界
+var reg = /\bc/; // 匹配字符串的边界不能是c
+\d 数字
+\D 非数字
+\f 换页
+\n 换行 \r 回车 \t 制表符 \v 垂直制表符 \s 匹配单个空格 \S 非空格
+\1 反向引用 reg=/(\w)\1/; str="bcdef";// 实际是要匹配bb
+一个小括号是一个子正则表达式，有几个子正则就可以有几个反引用。
+反向引用 reg=/(\w)(\w)\2\1/; str="woow";// 实际是要匹配(\w)(\w)===> wo ,\2\1则要匹配ow
+reg=/^(?:a|b)\1/;  ?: 不记录匹配内容，故反引用在该处无效
+正向预查 reg=/abc(?=8)/; 匹配rrabc8,不匹配rrabc9
+```
+##### 正则表达式修饰符
+* g 全局匹配修饰符，reg=/abc(?=8)/g
+* i 不区分大小写 /pattern/i
+* m 行首行尾修饰符 reg=/^b/; str='acc\nbdd'; 匹配失败。要想匹配成功，可以使用reg=/^b/m; str='acc\nbdd';
+
+##### match
+```js
+reg=/^b/; str='acc\nbdd';
+str.match(reg);  ===> 同exec
+reg.exec(str);
+```
+
+
+
+
 ## 下一篇文章
 
 [《JavaScript深入之从ECMAScript规范解读this》](https://github.com/mqyqingfeng/Blog/issues/7)
@@ -383,3 +456,7 @@ JavaScript深入系列目录地址：[https://github.com/mqyqingfeng/Blog](https
 JavaScript深入系列预计写十五篇左右，旨在帮大家捋顺JavaScript底层知识，重点讲解如原型、作用域、执行上下文、变量对象、this、闭包、按值传递、call、apply、bind、new、继承等难点概念。
 
 如果有错误或者不严谨的地方，请务必给予指正，十分感谢。如果喜欢或者有所启发，欢迎star，对作者也是一种鼓励。
+
+
+
+
