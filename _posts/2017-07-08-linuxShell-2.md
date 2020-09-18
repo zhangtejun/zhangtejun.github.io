@@ -1148,7 +1148,21 @@ YUM查询操作
 			gpgcheck=1
 		5.yum clean all 清楚缓存信息  原因：每次对yum仓库进行安装或查询类命令会重建yum缓存
 		yum list进行查看信息。
-		
+
+
+```
+# 压缩目录
+zip -r see_back.zip  /home/see/*
+# 登陆mysql
+./mysql -h127.0.0.1 -P3306 -uroot -pgfzq123456
+
+# 导入dump
+./mysql -h127.0.0.1 -P3306 -uroot -pgfzq123456 < /home/export_mysql_data_20200918.sql
+# 导出dump
+./mysql/bin/mysqldump -h127.0.0.1 -P3306 -uroot -pr#dcenter9 --quick --events --routines -B acm acm_job eccs > ./export_mysql_data.sql
+
+
+```
 		
 		
 		

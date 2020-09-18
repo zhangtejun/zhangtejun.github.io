@@ -49,6 +49,8 @@ tree2: "/assets/tree2.jpg"
 tree3: "/assets/tree3.jpg"
 tree4: "/assets/tree4.png"
 
+flux_1: "/assets/flux_1.jpg"
+
 #download
 notepad: "/download/Notepad++.zip"
 Araxis: "/download/Araxis++.zip"

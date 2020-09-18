@@ -450,6 +450,9 @@ root@zhtjun:~# grep ^$  test.txt
 #过滤出非空行，可以用-v,用来取反invert
 root@zhtjun:~# grep -v ^$  test.txt
 
+#过滤出不包含Ker的行，可以用-v,用来取反invert
+grep -v ^Ker
+
 #匹配包含数字的行
 root@zhtjun:~# grep [0-9]  test.txt
 
@@ -627,6 +630,9 @@ root@zhtjun:~# sed -n '/Linux/p' Linux.txt
 #删除文件前2行，
 root@zhtjun:~# sed -n '1,2d' Linux.txt
 
+#删除文件第一行，
+root@zhtjun:~# sed -n '1d' Linux.txt
+
 #删除包含linux的行，
 root@zhtjun:~# sed -n '/Linux/d' Linux.txt
 
@@ -725,17 +731,19 @@ awk支持2种不同的变量，内建变量和自定义变量
   3. FILENAME 当前输入的文件名
   4. FS 字段分隔符（默认是空格）
   5. NF 表示字段数，在执行过程中对应当前字段数，NF：列的个数
-  6. FNR 各文件分别计数的行号
-  7. NR 表示记录数，相当于行号
+  6. FNR 各文件分别计数的行号 (多个文件的情况下，每个文件行号单独计数)
+  7. NR 表示记录数，相当于行号 (多个文件的情况下，所有文件一起计数)
   8. OFS 输出字段分隔符 默认空格
   9. ORS 输出记录分隔符 默认换行符
   10. RS 记录分隔符 默认换行符
+  11. `-F[:#/]+` 定义3个分隔符
 
 * 常用命令选项
   1. -F 指定分隔符
   2. -v 赋值一个用户自定义变量
   3. -f 指定脚本文件，从脚本中读取awk命令
 
+命令格式：`awk [-F|-f|-v] 'BEGIN {} //{command1;command2} END {}' file `
 
 ```shell
 # 输出 BB
@@ -765,7 +773,43 @@ awk '{print $3}' a.txt  # => 3
 # 取倒数第二列
 awk '{print $(NF-1)}' a.txt  # => 2
 
+# 打印当前用户id小于10的名字和bash
+awk -F: '$3<10{print $1 "<---->" $NF}' /etc/passwd # 以<---->分隔格式输出（"\t" 指定tab；逗号[,] 输出多个列时，效果等同于空格）
 
+# 打印当前用户id大于等于1000并且bash为/bin/bash的名字和bash
+awk -F: '$3>=1000 && $NF == "/bin/bash" {print $1 , $NF}' /etc/passwd
+```
+
+**开始和结束模块**
+```shell
+BEGIN{
+        print"UserId\t\tShell"
+        print"--------------------------------"
+        FS=":"
+        }
+ $3>=1000 && $NF == "/bin/bash"{
+        printf"%-20s %-20s\n",$1,$NF
+        }
+END{
+
+        print"--------------------------------"
+}
+# 输出结果
+UserId          Shell
+--------------------------------
+debian               /bin/bash
+zhtjun               /bin/bash
+sonar                /bin/bash
+--------------------------------
+
+# 解释
+%-20s  格式化输出。“-” 左对齐 ；“+”右对齐，默认右对齐可以不带+号；20 20个宽度
+
+# 统计当前内存使用率
+#!/bin/bash
+echo "当前内存使用率"
+USEFREE=`free -m | grep -i mem |awk '{print $3/$2*100"%"}'`
+echo -e "\e[31m${USEFREE}\e[0m"
 ```
 
 ##### awk支持正则表达式
@@ -778,7 +822,42 @@ root@zhtjun:~# awk '$2~88' test.txt
 
 #取出第1 2 列另存为test.bak文件
 root@zhtjun:~# awk '{print $1 ,$2 >"test.bak"}' test.txt
+
+# 匹配以root开头的行,并输出整行及第2列
+awk -F: '/^root/{print $0,$2}' /etc/passwd
+
+# 行号大于等于3小于等于6
+awk -F: '(NR>=3&& NR<=6){print NR,$0}' /etc/passwd
 ```
+
+
+```shell
+# 使用awk 查出包括root字符的行
+awk -F: '/root/{print}' /etc/passwd
+awk -F: '/root/{print $0}' /etc/passwd
+awk -F: '/root/' /etc/passwd
+
+awk -F: '!/root/{print}' /etc/passwd  # 使用awk 查出不匹配root字符的行
+awk -F: '/bash$/' /etc/passwd # 使用awk 查出以bash结尾的行
+
+awk -F: '{$3<10? USER="aaa":USER="bbb";print $1,USER}' /etc/passwd
+# 如果UID>10 输出user => 用户名 否则输出 U => 用户名
+awk -F: '{if($3<10){print "user =>"$1} else {print "U =>"$1}}' /etc/passwd
+
+# 如果UID<5,并且包含bin/bash的行（~包含，!~ 不包含）
+awk -F: '{if($3<5 && $NF ~ "bin/bash"){print $1,$NF}}' /etc/passwd
+
+test = "test"
+awk 'BEGIN {print "'test'"}'# 引用变量时，不用$符合
+
+# 用10个字符串右对齐，不够10给字符，自动补全
+awk -F: '{printf "%10s\n",$1}' /etc/passwd
+
+# 用10个字符串右对齐，不够10给字符，自动补全
+awk -F: '{printf "%-10s\n",$1}' /etc/passwd
+```
+
+
 
 另一种常用格式： awk [-F 域分隔符]'命令' 文件名
 
@@ -788,6 +867,8 @@ root@zhtjun:~# awk '{print $1 ,$2 >"test.bak"}' test.txt
 root@zhtjun:~# awk -F: '{print $1 ,$7}' /etc/passwd
 # 实际上-F后面跟得分隔符指的是输入域分隔符，也可以由awk内置变量FS指定；相应的输出分隔符由awk的内置变量OFS指定，默认都是空格。
 root@zhtjun:~# awk '{FS=":";OFS="#"; print $1 ,$7}' /etc/passwd
+等同于
+root@zhtjun:~# awk '{FS=":"}{OFS="#"}{ print $1 ,$7}' /etc/passwd
 	
 ```
 awk 有BEGIN和END模块，简单来说，BENGIN总是先执行，END总是后执行。
@@ -806,6 +887,9 @@ root@zhtjun:~#  awk '{if($2>87){print $0}}' test.txt
 #打印一行后就退出
 root@zhtjun:~#  awk '{if($2>87){print $0；exit}}' test.txt
 ```
+
+**检测服务器是否受到DDOS关机**
+通过netstat 查看网络连接数，
 
 ##### 进程和作业
 正在运行的一个或者多个进程称为一个作业。

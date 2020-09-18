@@ -488,6 +488,17 @@ public class RibbonLoadBalancerClient implements LoadBalancerClient {
 ```
 
 
+##### Spring Cloud Sleuth(微服务追踪)
+接口监控：Sleuth
+日志监控：ELK+Kafka 分布式架构日志分散（一个请求经过多个微服务）
+
+
+##### Elasticsearch
+* Node
+* Cluster
+* Index
+* Document
+* Type
 
 
 

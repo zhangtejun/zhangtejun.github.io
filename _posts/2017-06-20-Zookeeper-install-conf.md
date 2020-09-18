@@ -5,6 +5,19 @@ date:   2017-06-19 15:00:00
 author: zhangtejun
 categories: Zookeeper
 ---
+
+##### Zookeeper
+
+客户端注册监听它关心的目录节点，当这个结点发生变化（数据改变，被删除，子节点新增/删除），zk会通知给客户端。
+
+
+zk四种形式的目录节点（默认是persistent ）
+* 持久化目录节点（PERSISTENT）
+* 持久化顺序编号目录节点（PERSISTENT_SEQUENTIAL）
+* 临时目录节点（EPHEMERAL）
+* 临时顺序编号目录节点（EPHEMERAL_SEQUENTIAL）
+
+
 ##### Zookeeper的安装与配置
 
 * 首先将安装包解压并进入该目录：

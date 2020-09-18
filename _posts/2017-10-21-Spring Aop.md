@@ -988,6 +988,9 @@ org.springframework.aop.framework.adapter包是一个SPI包，它允许添加新
 请参考org.springframework.aop.framework.adapter包的Javadoc来了解进一步的信息。
 
 
+https://mp.weixin.qq.com/s/-umxGe1VKEGO1mGI71rpfw
+
+
 
 
 
