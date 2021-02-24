@@ -362,3 +362,147 @@ IPC（Inter-Process Communication，进程间通信），传统上术语描述是运行在某个操作系
 
 
 
+##### 五大I/O模型
+* 阻塞式I/O模型 (blocking IO)
+    在linux中，所有的套接字默认情况下都是阻塞的。
+    
+优点：
+实现简单
+进程挂起不会消耗CPU资源
+
+缺点：
+I/O等待对性能影响较大
+每个连接需要独立的一个进程或线程处理，并发量较大时会消耗较多内存资源
+
+
+* 非阻塞式I/O模型 (nonblocking IO)
+    linux下，可以通过设置socket使其变为non-blocking。
+    
+* I/O复用式模型 （ IO multiplexing）
+* 信号驱动式I/O模型 （ signal driven IO）实际中并不常用
+* 异步I/O模型 （asynchronous IO）
+
+
+如何从用户空间进入内核空间
+
+所有的系统资源管理都是在内核空间中完成的。比如读写磁盘文件，分配回收内存，从网络接口读写数据等等。我们的应用程序是无法直接进行这样的操作的。但是我们可以通过内核提供的接口来完成这样的任务。
+比如应用程序要读取磁盘上的一个文件，它可以向内核发起一个 "系统调用" 告诉内核："我要读取磁盘上的某某文件"。其实就是通过一个特殊的指令让进程从用户态进入到内核态(到了内核空间)，在内核空间中，
+CPU 可以执行任何的指令，当然也包括从磁盘上读取数据。具体过程是先把数据读取到内核空间中，然后再把数据拷贝到用户空间并从内核态切换到用户态。
+
+##### epoll函数
+```
+#include <sys/epoll.h>
+# 创建一个epoll实例，并符合一个非负数作为文件描述符，参数size表示内核可能会容纳size个文件描述符，目前参数已被弃用
+int epoll_create(int size);
+
+# 使用文件描述符epfd引用的epoll，对文件描述符fd执行op操作，
+# 参数epfd表示epoll对应的文件描述符，fd表示socket对应的文件描述符，
+# 参数op有以下几个值：
+# # EPOLL_CTL_ADD 注册新的fd到epfd中，并关联事件event
+# # EPOLL_CTL_MOD 修改已注册的fd的监听事件
+# # EPOLL_CTL_DEL 从epfd中移除fd,并忽略掉绑定的event,这时event可以为null。
+int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event);
+
+# 等待文件描述符epfd上的事件，参数epfd表示epoll对应的文件描述符，events表示调用者所有可用事件的集合，
+# maxevents 表示最多等到多少个事件就返回，timeout 超时时间
+# 如果没有事件发生，就会阻塞，如果有事件处理事件
+int epoll_wait(int epfd, struct epoll_event * events, int maxevents, int timeout);
+
+
+```
+
+Selector 有2个集合，Channel集合(pollWrapper)和就绪事件列表集合(rdlist),epoll_wait会监听rdlist集合，
+如果rdlist为空，则等待。Channel是注册的时候，add到pollWrapper集合中的；rdlist集合如何收集到就绪事件？ 由操作系统把读写事件，连接事件放到该集合。
+
+当socket接收到数据后，操作系统中断程序调用回调函数会给epoll实例的事件就绪列表增加该socket引用（操作系统实现），当程序执行到epoll_wait时，如果
+rdlist中已经有了socket引用，那么epoll_wait将直接返回，否则将阻塞进程。
+
+
+```java
+ServerSocketChannel ssc = ServerSocketChannel.open();// 静态工厂创建服务端的Channel
+       ssc.configureBlocking(false);// 设置通道为非阻塞
+       ssc.socket().bind(new InetSocketAddress(8080)); // 绑定到一个socket对象
+       // 打开Selector处理Channel，即创建一个epoll(linux系统)
+       Selector selector = Selector.open(); // Selector静态工厂创建选择器（类比车站调度系统）
+       // 1. selector 需要感知 Channel 数据的读写，连接事件等，所以需要将通道注册到选择器上
+       // 2. 注册的内容很简单，就是将SocketChannel 的文件描述符fd, add 到 pollWrapper（EPollArrayWrapper 是 Selector 内部维持的一个对象属性） 中
+       // 3. 注册就是往 pollWrapper.add(fd),即pollWrapper中加入 SocketChannel，ServerSocketChannel
+       ssc.register(selector, SelectionKey.OP_ACCEPT); // 将通道注册到选择器上
+       //将线程置于睡眠状态
+       //int readyCount = selector.select (10000); // wait up to 10 seconds
+       while (true){
+           // // 该调用会阻塞，直到至少有一个事件就绪、准备发生
+           // 1. 调用 pollWrapper.poll(long timeout) ---> poll方法中先调用updateRegistrations()，接着调用epollWait
+           // 2. updateRegistrations 调用 native方法 epollCtl()，底层调用linux内核函数epoll_ctl()
+           // 3. 
+           int readyCount = selector.select();
+           if (readyCount == 0) {
+               continue; // nothing to do
+           }
+           // 调用selector的selectedKeys方法来检查已经注册在这个选择器上的所有通道信道是否有需要的事情发生，
+           Set<SelectionKey> keys = selector.selectedKeys();
+           Iterator<SelectionKey> iterator = keys.iterator();
+           while (iterator.hasNext()){
+               SelectionKey key = iterator.next();
+               // is new connection coming in ?
+               // OP_READ = 1 << 0
+               // expression1<<expression2，运算符把expression1的所有位向左移expression2指定的位数
+               if ((key.readyOps() & SelectionKey.OP_ACCEPT) == SelectionKey.OP_ACCEPT){
+                   //连接请求
+                   ServerSocketChannel server = (ServerSocketChannel) key.channel();
+                   SocketChannel channel = server.accept();
+                   registerChannel(selector, channel, SelectionKey.OP_READ);
+                   sayHello(channel); // 返回数据
+               } else  if (key.isReadable()){
+                   // 读取
+                   SocketChannel sc = (SocketChannel) key.channel();
+                   // 创建读取的缓冲区
+                   ByteBuffer buffer = ByteBuffer.allocate(1024);
+                   sc.read(buffer);
+                   byte[] data = buffer.array();
+                   String msg = new String(data,"UTF-8");
+                   System.out.println("服务端收到信息：" + msg);
+                   sayHello(sc); // 返回数据
+
+                   // 处理完后移除当前使用的key
+                   iterator.remove();
+               }
+           }
+       }
+```
+
+##### redis 
+
+select, poll, epoll 都是I/O多路复用的具体的实现,windows是否基于winsock2来实现的。
+* select 
+    操作方式 遍历（channel）；最大连接 有上限
+* poll
+    操作方式 遍历（channel） ；最大连接 无上限
+* epoll(jdk1.5及以后)
+    操作方式 回调 ；最大连接 无上限；每当有IO事件就绪，操作系统回调函数就会被调用。
+
+
+##### netty
+```
+EventLoopGroup boosGroup = new NioEventLoopGroup();//创建EventLoopGroup，一个线程池
+EventLoopGroup workGroup = new NioEventLoopGroup();//创建EventLoopGroup，一个线程池
+// 1. 创建服务器端启动对象
+ServerBootstrap bootstrap = new ServerBootstrap();
+
+
+bootstrap
+    //2.绑定一些线程池
+.group(boosGroup,workGroup)
+    // 3. 绑定其他参数
+.channel(NioServerSocketChannel.class)//指定使用NIO的传输Channel，指定信道类型
+.localAddress(new InetSocketAddress(port))//设置socket地址使用所选端口
+.childHandler(new ChannelInitializer<SocketChannel>() {//当有一个新的连接被接受，一个新的子Channel将被创建，ChannelInitializer添加EchoServerHandler到Channel的ChannelPipeline，
+ @Override
+ public void initChannel(SocketChannel ch) throws Exception{
+     // 绑定handle
+     ch.pipeline().addLast(
+        new EchoServerHandler());
+ }
+});
+ChannelFuture f = b.bind().sync();//4.绑定的服务器，sync等待服务器关闭，调用sync()的原因是当前线程阻塞
+```
