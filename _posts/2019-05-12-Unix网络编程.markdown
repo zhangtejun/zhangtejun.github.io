@@ -482,6 +482,151 @@ select, poll, epoll ¶¼ÊÇI/O¶àÂ·¸´ÓÃµÄ¾ßÌåµÄÊµÏÖ,windowsÊÇ·ñ»ùÓÚwinsock2À´ÊµÏÖµÄ¡
     ²Ù×÷·½Ê½ »Øµ÷ £»×î´óÁ¬½Ó ÎŞÉÏÏŞ£»Ã¿µ±ÓĞIOÊÂ¼ş¾ÍĞ÷£¬²Ù×÷ÏµÍ³»Øµ÷º¯Êı¾Í»á±»µ÷ÓÃ¡£
 
 
+##### netty  TODO eÅÌmybatis
+```
+EventLoopGroup boosGroup = new NioEventLoopGroup();//´´½¨EventLoopGroup£¬Ò»¸öÏß³Ì³Ø
+EventLoopGroup workGroup = new NioEventLoopGroup();//´´½¨EventLoopGroup£¬Ò»¸öÏß³Ì³Ø
+// 1. ´´½¨·şÎñÆ÷¶ËÆô¶¯¶ÔÏó
+ServerBootstrap bootstrap = new ServerBootstrap();
+
+
+bootstrap
+    //2.°ó¶¨Ò»Ğ©Ïß³Ì³Ø
+.group(boosGroup,workGroup)
+    // 3. °ó¶¨ÆäËû²ÎÊı
+.channel(NioServerSocketChannel.class)//Ö¸¶¨Ê¹ÓÃNIOµÄ´«ÊäChannel£¬Ö¸¶¨ĞÅµÀÀàĞÍ
+.localAddress(new InetSocketAddress(port))//ÉèÖÃsocketµØÖ·Ê¹ÓÃËùÑ¡¶Ë¿Ú
+.childHandler(new ChannelInitializer<SocketChannel>() {//µ±ÓĞÒ»¸öĞÂµÄÁ¬½Ó±»½ÓÊÜ£¬Ò»¸öĞÂµÄ×ÓChannel½«±»´´½¨£¬ChannelInitializerÌí¼ÓEchoServerHandlerµ½ChannelµÄChannelPipeline£¬
+ @Override
+ public void initChannel(SocketChannel ch) throws Exception{
+     // °ó¶¨handle
+     ch.pipeline().addLast(
+        new EchoServerHandler());
+ }
+});
+ChannelFuture f = b.bind().sync();//4.°ó¶¨µÄ·şÎñÆ÷£¬syncµÈ´ı·şÎñÆ÷¹Ø±Õ£¬µ÷ÓÃsync()µÄÔ­ÒòÊÇµ±Ç°Ïß³Ì×èÈû
+```
+
+##### Îå´óI/OÄ£ĞÍ
+* ×èÈûÊ½I/OÄ£ĞÍ (blocking IO)
+    ÔÚlinuxÖĞ£¬ËùÓĞµÄÌ×½Ó×ÖÄ¬ÈÏÇé¿öÏÂ¶¼ÊÇ×èÈûµÄ¡£
+    
+ÓÅµã£º
+ÊµÏÖ¼òµ¥
+½ø³Ì¹ÒÆğ²»»áÏûºÄCPU×ÊÔ´
+
+È±µã£º
+I/OµÈ´ı¶ÔĞÔÄÜÓ°Ïì½Ï´ó
+Ã¿¸öÁ¬½ÓĞèÒª¶ÀÁ¢µÄÒ»¸ö½ø³Ì»òÏß³Ì´¦Àí£¬²¢·¢Á¿½Ï´óÊ±»áÏûºÄ½Ï¶àÄÚ´æ×ÊÔ´
+
+
+* ·Ç×èÈûÊ½I/OÄ£ĞÍ (nonblocking IO)
+    linuxÏÂ£¬¿ÉÒÔÍ¨¹ıÉèÖÃsocketÊ¹Æä±äÎªnon-blocking¡£
+    
+* I/O¸´ÓÃÊ½Ä£ĞÍ £¨ IO multiplexing£©
+* ĞÅºÅÇı¶¯Ê½I/OÄ£ĞÍ £¨ signal driven IO£©Êµ¼ÊÖĞ²¢²»³£ÓÃ
+* Òì²½I/OÄ£ĞÍ £¨asynchronous IO£©
+
+
+ÈçºÎ´ÓÓÃ»§¿Õ¼ä½øÈëÄÚºË¿Õ¼ä
+
+ËùÓĞµÄÏµÍ³×ÊÔ´¹ÜÀí¶¼ÊÇÔÚÄÚºË¿Õ¼äÖĞÍê³ÉµÄ¡£±ÈÈç¶ÁĞ´´ÅÅÌÎÄ¼ş£¬·ÖÅä»ØÊÕÄÚ´æ£¬´ÓÍøÂç½Ó¿Ú¶ÁĞ´Êı¾İµÈµÈ¡£ÎÒÃÇµÄÓ¦ÓÃ³ÌĞòÊÇÎŞ·¨Ö±½Ó½øĞĞÕâÑùµÄ²Ù×÷µÄ¡£µ«ÊÇÎÒÃÇ¿ÉÒÔÍ¨¹ıÄÚºËÌá¹©µÄ½Ó¿ÚÀ´Íê³ÉÕâÑùµÄÈÎÎñ¡£
+±ÈÈçÓ¦ÓÃ³ÌĞòÒª¶ÁÈ¡´ÅÅÌÉÏµÄÒ»¸öÎÄ¼ş£¬Ëü¿ÉÒÔÏòÄÚºË·¢ÆğÒ»¸ö "ÏµÍ³µ÷ÓÃ" ¸æËßÄÚºË£º"ÎÒÒª¶ÁÈ¡´ÅÅÌÉÏµÄÄ³Ä³ÎÄ¼ş"¡£ÆäÊµ¾ÍÊÇÍ¨¹ıÒ»¸öÌØÊâµÄÖ¸ÁîÈÃ½ø³Ì´ÓÓÃ»§Ì¬½øÈëµ½ÄÚºËÌ¬(µ½ÁËÄÚºË¿Õ¼ä)£¬ÔÚÄÚºË¿Õ¼äÖĞ£¬
+CPU ¿ÉÒÔÖ´ĞĞÈÎºÎµÄÖ¸Áî£¬µ±È»Ò²°üÀ¨´Ó´ÅÅÌÉÏ¶ÁÈ¡Êı¾İ¡£¾ßÌå¹ı³ÌÊÇÏÈ°ÑÊı¾İ¶ÁÈ¡µ½ÄÚºË¿Õ¼äÖĞ£¬È»ºóÔÙ°ÑÊı¾İ¿½±´µ½ÓÃ»§¿Õ¼ä²¢´ÓÄÚºËÌ¬ÇĞ»»µ½ÓÃ»§Ì¬¡£
+
+##### epollº¯Êı
+```
+#include <sys/epoll.h>
+# ´´½¨Ò»¸öepollÊµÀı£¬²¢·ûºÏÒ»¸ö·Ç¸ºÊı×÷ÎªÎÄ¼şÃèÊö·û£¬²ÎÊısize±íÊ¾ÄÚºË¿ÉÄÜ»áÈİÄÉsize¸öÎÄ¼şÃèÊö·û£¬Ä¿Ç°²ÎÊıÒÑ±»ÆúÓÃ
+int epoll_create(int size);
+
+# Ê¹ÓÃÎÄ¼şÃèÊö·ûepfdÒıÓÃµÄepoll£¬¶ÔÎÄ¼şÃèÊö·ûfdÖ´ĞĞop²Ù×÷£¬
+# ²ÎÊıepfd±íÊ¾epoll¶ÔÓ¦µÄÎÄ¼şÃèÊö·û£¬fd±íÊ¾socket¶ÔÓ¦µÄÎÄ¼şÃèÊö·û£¬
+# ²ÎÊıopÓĞÒÔÏÂ¼¸¸öÖµ£º
+# # EPOLL_CTL_ADD ×¢²áĞÂµÄfdµ½epfdÖĞ£¬²¢¹ØÁªÊÂ¼şevent
+# # EPOLL_CTL_MOD ĞŞ¸ÄÒÑ×¢²áµÄfdµÄ¼àÌıÊÂ¼ş
+# # EPOLL_CTL_DEL ´ÓepfdÖĞÒÆ³ıfd,²¢ºöÂÔµô°ó¶¨µÄevent,ÕâÊ±event¿ÉÒÔÎªnull¡£
+int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event);
+
+# µÈ´ıÎÄ¼şÃèÊö·ûepfdÉÏµÄÊÂ¼ş£¬²ÎÊıepfd±íÊ¾epoll¶ÔÓ¦µÄÎÄ¼şÃèÊö·û£¬events±íÊ¾µ÷ÓÃÕßËùÓĞ¿ÉÓÃÊÂ¼şµÄ¼¯ºÏ£¬
+# maxevents ±íÊ¾×î¶àµÈµ½¶àÉÙ¸öÊÂ¼ş¾Í·µ»Ø£¬timeout ³¬Ê±Ê±¼ä
+# Èç¹ûÃ»ÓĞÊÂ¼ş·¢Éú£¬¾Í»á×èÈû£¬Èç¹ûÓĞÊÂ¼ş´¦ÀíÊÂ¼ş
+int epoll_wait(int epfd, struct epoll_event * events, int maxevents, int timeout);
+
+
+```
+
+Selector ÓĞ2¸ö¼¯ºÏ£¬Channel¼¯ºÏ(pollWrapper)ºÍ¾ÍĞ÷ÊÂ¼şÁĞ±í¼¯ºÏ(rdlist),epoll_wait»á¼àÌırdlist¼¯ºÏ£¬
+Èç¹ûrdlistÎª¿Õ£¬ÔòµÈ´ı¡£ChannelÊÇ×¢²áµÄÊ±ºò£¬addµ½pollWrapper¼¯ºÏÖĞµÄ£»rdlist¼¯ºÏÈçºÎÊÕ¼¯µ½¾ÍĞ÷ÊÂ¼ş£¿ ÓÉ²Ù×÷ÏµÍ³°Ñ¶ÁĞ´ÊÂ¼ş£¬Á¬½ÓÊÂ¼ş·Åµ½¸Ã¼¯ºÏ¡£
+
+µ±socket½ÓÊÕµ½Êı¾İºó£¬²Ù×÷ÏµÍ³ÖĞ¶Ï³ÌĞòµ÷ÓÃ»Øµ÷º¯Êı»á¸øepollÊµÀıµÄÊÂ¼ş¾ÍĞ÷ÁĞ±íÔö¼Ó¸ÃsocketÒıÓÃ£¨²Ù×÷ÏµÍ³ÊµÏÖ£©£¬µ±³ÌĞòÖ´ĞĞµ½epoll_waitÊ±£¬Èç¹û
+rdlistÖĞÒÑ¾­ÓĞÁËsocketÒıÓÃ£¬ÄÇÃ´epoll_wait½«Ö±½Ó·µ»Ø£¬·ñÔò½«×èÈû½ø³Ì¡£
+
+
+```java
+ServerSocketChannel ssc = ServerSocketChannel.open();// ¾²Ì¬¹¤³§´´½¨·şÎñ¶ËµÄChannel
+       ssc.configureBlocking(false);// ÉèÖÃÍ¨µÀÎª·Ç×èÈû
+       ssc.socket().bind(new InetSocketAddress(8080)); // °ó¶¨µ½Ò»¸ösocket¶ÔÏó
+       // ´ò¿ªSelector´¦ÀíChannel£¬¼´´´½¨Ò»¸öepoll(linuxÏµÍ³)
+       Selector selector = Selector.open(); // Selector¾²Ì¬¹¤³§´´½¨Ñ¡ÔñÆ÷£¨Àà±È³µÕ¾µ÷¶ÈÏµÍ³£©
+       // 1. selector ĞèÒª¸ĞÖª Channel Êı¾İµÄ¶ÁĞ´£¬Á¬½ÓÊÂ¼şµÈ£¬ËùÒÔĞèÒª½«Í¨µÀ×¢²áµ½Ñ¡ÔñÆ÷ÉÏ
+       // 2. ×¢²áµÄÄÚÈİºÜ¼òµ¥£¬¾ÍÊÇ½«SocketChannel µÄÎÄ¼şÃèÊö·ûfd, add µ½ pollWrapper£¨EPollArrayWrapper ÊÇ Selector ÄÚ²¿Î¬³ÖµÄÒ»¸ö¶ÔÏóÊôĞÔ£© ÖĞ
+       // 3. ×¢²á¾ÍÊÇÍù pollWrapper.add(fd),¼´pollWrapperÖĞ¼ÓÈë SocketChannel£¬ServerSocketChannel
+       ssc.register(selector, SelectionKey.OP_ACCEPT); // ½«Í¨µÀ×¢²áµ½Ñ¡ÔñÆ÷ÉÏ
+       //½«Ïß³ÌÖÃÓÚË¯Ãß×´Ì¬
+       //int readyCount = selector.select (10000); // wait up to 10 seconds
+       while (true){
+           // // ¸Ãµ÷ÓÃ»á×èÈû£¬Ö±µ½ÖÁÉÙÓĞÒ»¸öÊÂ¼ş¾ÍĞ÷¡¢×¼±¸·¢Éú
+           // 1. µ÷ÓÃ pollWrapper.poll(long timeout) ---> poll·½·¨ÖĞÏÈµ÷ÓÃupdateRegistrations()£¬½Ó×Åµ÷ÓÃepollWait
+           // 2. updateRegistrations µ÷ÓÃ native·½·¨ epollCtl()£¬µ×²ãµ÷ÓÃlinuxÄÚºËº¯Êıepoll_ctl()
+           // 3. 
+           int readyCount = selector.select();
+           if (readyCount == 0) {
+               continue; // nothing to do
+           }
+           // µ÷ÓÃselectorµÄselectedKeys·½·¨À´¼ì²éÒÑ¾­×¢²áÔÚÕâ¸öÑ¡ÔñÆ÷ÉÏµÄËùÓĞÍ¨µÀĞÅµÀÊÇ·ñÓĞĞèÒªµÄÊÂÇé·¢Éú£¬
+           Set<SelectionKey> keys = selector.selectedKeys();
+           Iterator<SelectionKey> iterator = keys.iterator();
+           while (iterator.hasNext()){
+               SelectionKey key = iterator.next();
+               // is new connection coming in ?
+               // OP_READ = 1 << 0
+               // expression1<<expression2£¬ÔËËã·û°Ñexpression1µÄËùÓĞÎ»Ïò×óÒÆexpression2Ö¸¶¨µÄÎ»Êı
+               if ((key.readyOps() & SelectionKey.OP_ACCEPT) == SelectionKey.OP_ACCEPT){
+                   //Á¬½ÓÇëÇó
+                   ServerSocketChannel server = (ServerSocketChannel) key.channel();
+                   SocketChannel channel = server.accept();
+                   registerChannel(selector, channel, SelectionKey.OP_READ);
+                   sayHello(channel); // ·µ»ØÊı¾İ
+               } else  if (key.isReadable()){
+                   // ¶ÁÈ¡
+                   SocketChannel sc = (SocketChannel) key.channel();
+                   // ´´½¨¶ÁÈ¡µÄ»º³åÇø
+                   ByteBuffer buffer = ByteBuffer.allocate(1024);
+                   sc.read(buffer);
+                   byte[] data = buffer.array();
+                   String msg = new String(data,"UTF-8");
+                   System.out.println("·şÎñ¶ËÊÕµ½ĞÅÏ¢£º" + msg);
+                   sayHello(sc); // ·µ»ØÊı¾İ
+
+                   // ´¦ÀíÍêºóÒÆ³ıµ±Ç°Ê¹ÓÃµÄkey
+                   iterator.remove();
+               }
+           }
+       }
+```
+
+##### redis 
+
+select, poll, epoll ¶¼ÊÇI/O¶àÂ·¸´ÓÃµÄ¾ßÌåµÄÊµÏÖ,windowsÊÇ·ñ»ùÓÚwinsock2À´ÊµÏÖµÄ¡£
+* select 
+    ²Ù×÷·½Ê½ ±éÀú£¨channel£©£»×î´óÁ¬½Ó ÓĞÉÏÏŞ
+* poll
+    ²Ù×÷·½Ê½ ±éÀú£¨channel£© £»×î´óÁ¬½Ó ÎŞÉÏÏŞ
+* epoll(jdk1.5¼°ÒÔºó)
+    ²Ù×÷·½Ê½ »Øµ÷ £»×î´óÁ¬½Ó ÎŞÉÏÏŞ£»Ã¿µ±ÓĞIOÊÂ¼ş¾ÍĞ÷£¬²Ù×÷ÏµÍ³»Øµ÷º¯Êı¾Í»á±»µ÷ÓÃ¡£
+
+
 ##### netty
 ```
 EventLoopGroup boosGroup = new NioEventLoopGroup();//´´½¨EventLoopGroup£¬Ò»¸öÏß³Ì³Ø

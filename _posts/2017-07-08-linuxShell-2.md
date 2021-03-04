@@ -1164,5 +1164,15 @@ zip -r see_back.zip  /home/see/*
 
 ```
 		
-		
+Linux安装字体
+Linux字体目录：/usr/share/fonts
+在fonts下面新建一个目录，例如：mkdir myfonts
+将需要安装的字体放到新建目录下面，例如：cp ~/test/simsun.ttf /usr/share/fonts/myfonts
+进入到myfonts目录：cd /usr/share/fonts/myfonts
+执行如下命令：
+mkfontscale
+mkfontdir
+fc-cache -fv
+查看是否已经安装对应的字体：fc-list
+fc-cache -fv 命令用来刷新linux的字体缓存，使其立刻生效		
 		
