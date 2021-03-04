@@ -629,25 +629,66 @@ select, poll, epoll ¶¼ÊÇI/O¶àÂ·¸´ÓÃµÄ¾ßÌåµÄÊµÏÖ,windowsÊÇ·ñ»ùÓÚwinsock2À´ÊµÏÖµÄ¡
 
 ##### netty
 ```
-EventLoopGroup boosGroup = new NioEventLoopGroup();//´´½¨EventLoopGroup£¬Ò»¸öÏß³Ì³Ø
-EventLoopGroup workGroup = new NioEventLoopGroup();//´´½¨EventLoopGroup£¬Ò»¸öÏß³Ì³Ø
-// 1. ´´½¨·şÎñÆ÷¶ËÆô¶¯¶ÔÏó
-ServerBootstrap bootstrap = new ServerBootstrap();
+public static void main(String[] args) throws InterruptedException {
+        /**
+         * ´´½¨EventLoopGroup£¬Ò»¸öÏß³Ì³ØmainReactor ÓÃÓÚ½ÓÊÕ¿Í»§¶ËÁ¬½Ó
+         * ¶ÔÓ¦¿Í»§¶ËÁ¬½ÓÀ´Ëµ£¬´¦ÀíÊÇ·Ç³£¿ìËÙµÄ£¬Ïß³Ì´óĞ¡²¢²»ĞèÒªÌ«¶à
+         * ½¨Á¢Á¬½Óºó£¬°Ñchannel×¢²áµ½workGroup ÖĞÈ¥ÁË£¬ÕæÕıºÄÊ±µÄwork
+         * ,´¦ÀíchannelµÄ¶ÁĞ´ÊÂ¼ş£¬Ã¿¸öÏß³Ì°ó¶¨Ò»¸öselector
+         *
+         * 2. boosGroup °üº¬Ò»¸öNioEventLoop£¬Ã¿¸öNioEventLoop°üº¬Ò»¸öSelectorºÍTaskQueue
+         *    ¶ÔÓÚworkGroupÀ´Ëµ£¬ÒÔÏÂ´úÂëÓĞ8¸öNioEventLoop¡££¨¶à¸öNioEventLoop£¬½µµÍÁËÃ¿¸öselectÊÂ¼şÁĞ±íµÄ´¦ÀíÑ­»·Ê±¼ä£©
+         */
+        EventLoopGroup boosGroup = new NioEventLoopGroup(1);
+        EventLoopGroup workGroup = new NioEventLoopGroup(8);//´´½¨EventLoopGroup£¬Ò»¸öÏß³Ì³ØsubReactor ÓÃÓÚ´¦ÀíÒÑ·¢ÉúµÄÊÂ¼ş
 
+        // 1. ´´½¨·şÎñÆ÷¶ËÆô¶¯¶ÔÏó
+        ServerBootstrap bootstrap = new ServerBootstrap();
 
-bootstrap
-    //2.°ó¶¨Ò»Ğ©Ïß³Ì³Ø
-.group(boosGroup,workGroup)
-    // 3. °ó¶¨ÆäËû²ÎÊı
-.channel(NioServerSocketChannel.class)//Ö¸¶¨Ê¹ÓÃNIOµÄ´«ÊäChannel£¬Ö¸¶¨ĞÅµÀÀàĞÍ
-.localAddress(new InetSocketAddress(port))//ÉèÖÃsocketµØÖ·Ê¹ÓÃËùÑ¡¶Ë¿Ú
-.childHandler(new ChannelInitializer<SocketChannel>() {//µ±ÓĞÒ»¸öĞÂµÄÁ¬½Ó±»½ÓÊÜ£¬Ò»¸öĞÂµÄ×ÓChannel½«±»´´½¨£¬ChannelInitializerÌí¼ÓEchoServerHandlerµ½ChannelµÄChannelPipeline£¬
- @Override
- public void initChannel(SocketChannel ch) throws Exception{
-     // °ó¶¨handle
-     ch.pipeline().addLast(
-        new EchoServerHandler());
- }
-});
-ChannelFuture f = b.bind().sync();//4.°ó¶¨µÄ·şÎñÆ÷£¬syncµÈ´ı·şÎñÆ÷¹Ø±Õ£¬µ÷ÓÃsync()µÄÔ­ÒòÊÇµ±Ç°Ïß³Ì×èÈû
+        bootstrap.group(boosGroup,workGroup)// 2.°ó¶¨Ò»Ğ©Ïß³Ì³Ø
+                .channel(NioServerSocketChannel.class)//Ö¸¶¨Ê¹ÓÃNIOµÄ´«ÊäChannel£¬Ö¸¶¨ĞÅµÀÀàĞÍ
+                .option(ChannelOption.SO_BACKLOG,1024) // TCP Ïà¹Ø²ÎÊı
+                .childHandler(new ChannelInitializer<SocketChannel>() {//µ±ÓĞÒ»¸öĞÂµÄÁ¬½Ó±»½ÓÊÜ£¬Ò»¸öĞÂµÄ×ÓChannel½«±»´´½¨£¬ChannelInitializerÌí¼ÓEchoServerHandlerµ½ChannelµÄChannelPipeline£¬
+                    @Override
+                    public void initChannel(SocketChannel ch) throws Exception{
+                        // ¶ÔworkGroup°ó¶¨handle
+                        ch.pipeline().addLast(new NettyServerHandler());
+                    }
+                });
+        ChannelFuture f = bootstrap.bind(6666).sync();//4.°ó¶¨µÄ·şÎñÆ÷£¬syncµÈ´ı·şÎñÆ÷¹Ø±Õ£¬µ÷ÓÃsync()µÄÔ­ÒòÊÇµ±Ç°Ïß³Ì×èÈû
+    }
 ```
+
+HeapByteBuffer ·ÖÅäµÄbufferÊÇÔÚjvm µÄ heapÇøÓò¡£
+
+DirectByteBuffer ·ÖÅäµÄÄÚ´æ²»ÔÙÊÇÔÚjava heapÉÏ¡£ ¶øÊÇ os::malloc(),µ÷ÓÃ²Ù×÷ÏµÍ³ÄÚºËº¯Êı·ÖÅäÖ±½ÓÄÚ´æ¡£ÆäÄÚ´æµÄÇåÀí£¨ĞéÒıÓÃ£©
+
+
+#### reactorÄ£Ê½ (µ¥Ïß³Ìreactor£¬¶àÏß³Ìreactor,Ö÷´Óreactor)
+##### µ¥Ïß³Ìreactor
+reactor µ¥Ïß³ÌÄ£Ê½ÊÇÖ¸ËùÓĞµÄI/O²Ù×÷¶¼ÔÚÒ»¸öNIOÏß³ÌÍê³É£¬¸ÃÏß³ÌµÄÖ°Ôğ£º
+
+1. ×÷ÎªNIO·şÎñ¶Ë£¬½ÓÊÕ¿Í»§¶ËTCPÁ¬½Ó
+
+2. ×÷ÎªNIO¿Í»§¶Ë£¬Ïò¿Í»§¶Ë·¢ËÍTCPÁ¬½Ó
+
+3. READ/WRITE ´¦Àí¿Í»§¶ËµÄÇëÇó
+
+¸ß²¢·¢Á¿µÄÏµÍ³ÈÔÈ»´æÔÚÆ¿¾±£¬reactor Ïß³Ì¼ÈÒª´¦ÀíÀ´×Ô¿Í»§¶ËµÄÁ¬½Ó£¬ÓÖÒª´¦ÀíREAD/WRITE/±àÂë/½âÂë¡£
+
+##### ¶àÏß³ÌreactorÄ£ĞÍ
+
+1. reactor ¶àÏß³ÌµÄÊµÏÖ×î´óµÄÇø±ğÊÇÓµÓĞÒ»¸ö×¨ÃÅÓÃÀ´´¦ÀíÊµ¼ÊI/O ²Ù×÷ÊÇÏß³Ì³Ø
+2. ÓµÓĞÒ»¸öAcceptor ×¨ÃÅÓÃÀ´¼àÌıÇëÇóµÄI/O ÀàĞÍ
+3. Ê¹ÓÃ×¨ÃÅÏß³Ì³Ø¿ÉÒÔÌá¸ßacceptorµÄ²¢·¢Á¿
+
+µ¥¸öAcceptor Ïß³Ì ¿ÉÄÜ»áÒòÎªĞèÒª¼àÌı´óÁ¿µÄ SocketChannel Á¬½Ó »ò I/OÊÂ¼ş´¦Àí»òÔÚ½¨Á¢½¨Á¢Ê±ĞèÒª½øĞĞ°²È«µÄÎÕÊÖÈÏÖ¤¡¢ºÚ°×Ãûµ¥¹ıÂË£¬
+¶øµ¼ÖÂ³öÏÖĞÔÄÜÆ¿¾±¡£ËùÒÔÕâÖÖ³¡¾°ÏÂ£¬µ¥¶ÀÒ»¸öAccceptor »áµ¼ÖÂĞÔÄÜ²»×ã£¬±ã³öÏÖÁËµÚÈıÖÖÏß³ÌÄ£ĞÍ£¬Ö÷´ÓReactor Ä£ĞÍ
+
+##### Ö÷´Óreactor ¶àÏß³ÌÄ£ĞÍ
+Ïà±È¶àÏß³ÌreactorÄ£ĞÍ£¬Ö÷´Óreactor¶àÏß³ÌÄ£ĞÍÓµÓĞÁËÒ»¸ö¶ÀÁ¢´¦Àí SocketChannel Á¬½ÓµÄÏß³Ì³Ø£¨mainReactor£©£¬µ±¿Í»§¶Ë´ÓAcceptor½¨Á¢Á¬½ÓÖ®ºó£¬
+±ã½«¸ÃÁ¬½Ó°ó¶¨(×¢²á)µ½ subReactor £¨subReactor ¿ÉÒÔ¶à¸ö£©Ïß³Ì³ØÖĞµÄÄ³¸öÏß³ÌÖĞ£¬È»ºóÓÉ¸ÃÏß³Ì°ó¶¨¿Í»§¶Ë¸ĞĞËÈ¤µÄI/OÊÂ¼ş£¨READ/WRITE£©£¬¼àÌı¿Í»§¶ËÁ¬½ÓÇëÇó£¬×îºó´¦Àí¡£
+
+1. mainReactor : ¼àÌı ServerSocketChannel ¡¢½¨Á¢Óë SocketChannel  µÄÁ¬½Ó¡¢½«Íê³É½¨Á¢Á¬½ÓÖ®ºóµÄSocket ½»¸øsubReactor
+
+2. subReactor : ¼àÌıSocketChannelµÄ I/OÊÂ¼ş£¬Íê³É±à½âÂë¡¢ÏàÓ¦µÄÒµÎñ´¦Àí£¨Ä¬ÈÏÎªCPU¸öÊı£©£¬£¨¶à¸ösubReactor£¬½µµÍÁËÃ¿¸öselectÊÂ¼şÁĞ±íµÄ´¦ÀíÑ­»·Ê±¼ä£©
