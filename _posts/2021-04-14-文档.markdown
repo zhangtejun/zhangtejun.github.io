@@ -1,0 +1,15 @@
+---
+layout: post
+title:  "文档"
+date:   2021-04-14 17:12:42
+author: zhangtj
+categories: zhangtj
+---
+**linux 服务器私钥登录**
+```
+1. linux服务器A使用相关用户登录比如root
+2. 执行命令 ssh-keygen -t rsa
+3. 上传公钥到目标机器 ssh-copy-id root@IP(服务器B的ip或者hostname)
+4. 此时linux服务器A可免登录服务器B
+5. 使用私钥登录 私钥为id_rsa中额内容
+```
