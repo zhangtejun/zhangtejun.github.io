@@ -11,5 +11,460 @@ categories: zhangtj
 2. 执行命令 ssh-keygen -t rsa
 3. 上传公钥到目标机器 ssh-copy-id root@IP(服务器B的ip或者hostname)
 4. 此时linux服务器A可免登录服务器B
-5. 使用私钥登录 私钥为id_rsa中额内容
+5. 使用私钥登录 私钥为id_rsa中的内容
+
+
+sc *XXX
+watch 类名 方法名 "{params,returnObj}" -x 2 -b
+观察方法出参和返回值
+watch 类名 方法名 "{params,returnObj}" -x 2
+
+同时观察方法调用前和方法返回后
+参数里-n 2，表示只执行两次，这里输出结果中，第一次输出的是方法调用前的观察表达式的结果，第二次输出的是方法返回后的表达式的结果
+结果的输出顺序和事件发生的先后顺序一致，和命令中 -s -b 的顺序无关
+                
+                
+watch 类名 方法名 "{params,target,returnObj}" -x 2 -b -s -n 2
+
 ```
+
+**Spring boot**
+spring boot 允许我们以配置的方式进行干预：
+* 命令行参数
+* 系统环境变量
+* 位于文件系统中的配置文件
+* 位于classpath中的配置文件
+* 固化在代码中的配置项
+
+Spring Boot支持四种配置文件格式：`xml,properties,yml, yaml`
+
+默认加载顺序配置(将元素进行反转，所以查找的路径实际跟DEFAULT_SEARCH_LOCATIONS所定义的顺序刚好相反。)
+```
+private static final String DEFAULT_SEARCH_LOCATIONS = "classpath:/,classpath:/config/,file:./,file:./config/";
+```
+
+高优先级的配置文件会覆盖或者优先有效
+分别从`file:./config/, file:./, classpath:/config/, classpath:/ `这四个位置依次读取后缀名为`properties,yml, yaml`的配置文件
+
+优先级相同的情况下，同时有application.properties和application.yml，那么application.properties里面的属性就会覆盖application.yml里的属
+性，因为properties比yml优先加载。
+
+`https://start.spring.io/actuator/info`
+
+spring cloud 
+* 服务注册中心(Eureka停更) Zookeeper,Consul(go语言写的),Nacos
+* 服务调用 Ribbon LoadBalancer(会逐渐替换Ribbon)
+* 服务调用2 Feign停更 OpenFeign来替代
+* 服务熔断、降级 Hystrix(停更官网不推荐，国内用的多)，resilience4j(国内用的少，官网推荐)，SpringCloud Alibaba Sentinel
+* 服务网关 Zuul停更,gateway(spring社区推荐的)
+* 服务配置 Config (不在使用)，携程阿波罗，Nacos
+* 服务总线 Bus ，Nacos
+
+1, 聚合父工程，new Project创建工程,建module,改pom,yml,启动类，业务类
+2. 建entities，
+3. json返回封装提CommonResult<T>
+4. dao
+5. service
+6. controller
+
+
+1. 热部署 devtools 添加devtools jar,添加spring-boot-maven-plugin 插件到maven pom，开启自动编译(intellj 打开 abcd选项)，ctrl+shift+alt+/
+
+1. payment(provicer)
+
+1. order（consumer） order可通过restTemplate 访问payment服务
+
+新建api-commons
+
+**服务注册中心**
+服务治理：
+在传统的rpc远程调用框架中，管理每个服务和服务之间依赖关系比较复杂，管理比较复杂，所以需要使用服务治理，管理服务之间依赖关系，
+可以实现服务调用，负载均衡，容错等，实现服务注册和发现。
+
+服务发现Discovery：对注册进eureka里的微服务，可以通过服务发现来获取该服务的信息
+
+Eureka Server 2个组件 server client
+自我保护机制
+
+保护模式主要用于一组客户端和Eureka Server之间存在网络分区场景下的保护，一旦进入保护模式
+Eureka Server将会尝试保护其注册表中的注册信息，不再删除服务注册表中的数据，也就是不会注销任务微服务。
+
+即某时刻一个微服务不可用了，Eureka Server不会立刻清理，依旧会对该微服务的信息进行保存，属于CAP里面的AP。
+
+为什么会产生自我保护机制？
+为了防止Eureka Client可以正常运行，但是和Eureka Server网络不通的情况下，Eureka Server不会立刻将Eureka Client服务剔除。
+
+什么是自我保护机制？
+默认情况下，如果Eureka Server在一定时间内没有收到某个微服务的心跳，Eureka Server将会注销该实例（默认90s）,但是当网络分区发生故障
+（延时，卡顿，拥挤）时，微服务和Eureka Server之间无法正常通信，以上默认行为变得非常危险----因为微服务本身是正常的，此时本不应该注销该微服务。
+Eureka Server通过自我保护模式来决绝这个问题----当Eureka Server节点再短时间内丢失过多的客户端时（可能发生了网络服务故障），
+那么这个节点就会进入保护模式。
+
+它的设计理念是宁可保留错误的服务注册信息，也不盲目的注销可能健康的服务，使用自我保护模式，可以让Eureka 集群更加健壮，稳定。
+
+```
+# server 配置
+eureka:
+  server:
+    #关闭自我保护机制，保证不可用服务被及时剔除
+    enable-self-preservation: false
+    #清理无效节点的时间间隔，默认60000毫秒，即60秒(此处时间间隔设置为2s)
+    eviction-interval-timer-in-ms: 2000
+
+# client 配置
+eureka:
+  instance:
+     # eureka客户端向服务端发送心跳时间，即服务续约间隔时间（缺省为30s）
+    lease-renewal-interval-in-seconds: 5     
+     # eureka服务端在收到最后一次心跳后等待时间上限，即服务续约到期时间（缺省为90s）超时将剔除服务
+    lease-expiration-duration-in-seconds: 10 
+```
+
+Eureka停更
+
+SpringCloud整合Zookeeper代替Eureka
+ZooKeeper是一个分布式的协调工具，可以实现注册中心功能。
+
+zk服务节点是临时节点还是持久节点? 临时节点 服务停止后一段时间后会踢掉服务节点
+
+Consul注册中心
+Consul简介：Consul是一套开源的分布式服务发现和配置管理系统，由HashiCorp公司用Go语言开发。
+提供了微服务系统中的服务治理，配置中心，控制总线等。
+`consul agent -dev -ui -node=consul-dev -client=0.0.0.0`
+
+
+CAP：
+C:Consistency (强一致性)
+A:Availability (可用性)
+P:Partition tolerance ( 分区容错性)
+
+CAP理论关注粒度是数据，而不是整体。
+
+
+3个注册中心的区别：eureka AP（java）; ZooKeeper CP（java）; Consul CP（Go）。
+
+
+SpringCloud Ribbon 是基于Netflix Ribbon 实现的一套客户端，主要功能是提供客户端软件负载均衡算法和访问调用，
+Ribbon 客户端组件提供完善的配置比如连接超时，重试等，
+
+Ribbon已经进入了维护模式了，未来的替换方案SpringCloud Ribbon。Ribbon目前已经大规模使用。
+
+Ribbon本地负载均衡客户端 和 Nginx服务端负载均衡
+Nginx是服务端负载均衡，客户端所有请求都会交给nginx,由nginx实现转发。即该负载均衡是服务端实现的。
+
+Ribbon本地负载均衡，在调用微服务接口时，会在注册中心上获取注册信息服务列表后缓存到JVM本地，从而在本地实现RPC远程服务调用。
+
+Ribbon软负载均衡的客户端组件，
+Ribbon工作步骤：
+* 先选择EurekaServer，它优先选择在同一个区域较少的server。
+* 再根据用户指定的策略，在server取到的服务注册列表中选择一个地址。
+比如轮询，随机，根据响应时间加权重等
+
+RestTemplate
+
+Ribbon核心组件IRule：
+根据特定算法从服务列表中选取一个要访问的服务,自带的负载策略：
+* RoundRobinRule  轮询策略
+* RandomRule	随机策略
+* RetryRule	重试策略 先按照RoundRobinRule获取服务，如果服务失败则在指定时间内进行重试，获取可用的服务
+* WeightedResponseTimeRule	 对RoundRobinRule的扩展，响应速度越快的实例权重越大，越容易被选择
+* BestAvailableRule	 会过滤掉多次访问故障而处理跳闸状态的服务，然后选择一个并发量小的服务
+* AvailabilityFilteringRule	可用过滤策略  先过滤掉故障实例，再选择并发量小的服务
+* ZoneAvoidanceRule	区域权重策略 默认规则，符合判断server所在区域的性能和server的可用性选择服务器
+
+如何替换？
+官方文档给出了警告，这个自定义配置类不能放在@ComponScan所扫描的当前包及子包下，否正我们自定义的这个配置类会被所有的Ribbon客户端
+共享，达不到特殊话定制的效果。
+
+1. 新建package 为了和main类不在同一个包下,建MyRuleConfig配置类，并修改负载策略
+2. 主启动类增加@RibbonClient(name='微服务name',configuration = MyRuleConfig.class)
+
+Ribbon负载均衡算法：
+
+`List<ServiceInstance> instances = discoveryClient.getInstances("微服务name");`
+
+原理：rest接口第几次请求数 % 服务器集群数量 = 实际调用服务器位置下标，每次重启服务器后rest接口
+计数从1开始。
+
+例如：总集群2个
+1 % 2 = 1
+2 % 2 = 0
+3 % 2 = 1
+
+
+OpenFeign 是什么？
+
+Feign是一个声明式WebService客户端，使用Feign可以让编写Web Service客户端更加简单。
+它的使用方法是定义一个服务接口然后在上面添加注解。Feign也支持可插式的编码器和解码器。
+Spring cloud对Feign进行了封装，使其支持Spring MVC标准注解和HttpMessageConverters。
+Feign可以和Eureka和Ribbon组合使用支持负载均衡。
+
+优雅简单实现调用服务接口
+
+OpenFeign使用步骤：
+1. Feign用在服务的消费方，用来调用服务提供者的接口
+2. 新增注解接口
+3. Feign负载均衡配置,可以在 application.yml 配置文件中来指定
+```
+@Component
+@FeignClient(value = "CLOUD-PAYMENT-SERVICE")
+public interface PaymentFeignService {
+    @GetMapping("/consumer/payment/get/{id}")
+    CommonResult<Payment> getPaymentById(@PathVariable("id") String id);
+}
+```
+
+OpenFeign超时配置:
+1. 默认超时时间是1s,超过后调用报错
+2. yml 配置文件中来指定超时时间
+3. 默认支持ribbon,超时时间由ribbon更改
+```
+ribbon:
+  ReadTimeout: 10000
+  ConnectTimeout: 10000
+```
+OpenFeign日志打印:
+日志级别，NONE默认的，不显示任何日志 ；BASIC仅记录请求方法，url,响应状态码及执行时间
+；HEADERS 除BASIC以外，还有请求和响应的头信息；FULL除HEADERS以外,还有请求和响应的正文及元数据
+
+1. 配置bean
+```
+@Configuration
+public class FeignConfig {
+    @Bean
+    Logger.Level feignLoggerLevel(){
+        return Logger.Level.FULL;
+    }
+}
+```
+2. yml开启log
+```
+logging:
+  level:
+    # 以什么日志级别监控哪个接口
+    springcloud.service.PaymentFeignService: debug
+```
+
+服务降级
+Hystrix断路器
+
+Hystrix是应该用于处理分布式系统的`延迟`和`容错`的开源库，在分布式系统中，许多依赖不可避免会调用失败，
+比如超时，异常等，Hystrix能保证在一个依赖出问题的情况下，不会导致整体服务失败，避免级联故障，以提高分布式系统的弹性。
+”断路器“ 本身是一种开关装置，当某个服务发送故障后，通过断路器的故障监控，向调用方返回一个符合预期，可处理的备选响应（Fallback）
+,而不是长时间的等待或者抛出调用方无法处理的异常，这样可以保证服务调用方的线程不会被长时间，不必要的占用，从而避免故障在分布式系统中的蔓延，乃至雪崩。
+
+能做什么？服务降级，服务熔断，接近实时的监控
+
+Hystrix重要概念
+1. 服务降级 服务器忙。不然客户端等待并立刻返回一个友好提示（fallback）,哪些情况下会出现？1. 程序运行异常，2. 超时 3. 服务熔断发送降级
+   4. 线程池/信号量打满也会导致服务降级
+2. 服务熔断 就是保险丝，类比达到服务最大服务量时，直接拒绝访问，然后调用服务降级方法并返回友好提示,服务熔断会触发服务降级
+3. 服务限流 秒杀高并发等操作
+
+Hystrix一般用在消费端，也可以在服务端。
+
+对方法处理
+
+方法上增加@HystrixCommand
+主启动类@EnableCircuitBreaker/@EnableHystrix
+
+对类处理
+
+统一的降级方法，在类上配置@DefaultProperties(defaultFallback = ""),在方法上增加@HystrixCommand 不带参数。
+
+对feign增加处理
+```
+feign:
+  hystrix:
+    enable: true
+
+@Component
+@FeignClient(value = "CLOUD-PAYMENT-SERVICE",fallback = PaymentFallbackFeignService.class)
+public interface PaymentFeignService {
+    @GetMapping("/consumer/payment/get/{id}")
+    String getPaymentById(@PathVariable("id") String id);
+}
+```
+服务熔断机制，熔断机制是应对雪崩效应的一种微服务链路保护机制，当扇出链路的某个微服务出错不可用或者响应时间太长时，会进行服务降级，进而熔断该节点微服务的调用，快速返回
+错误的响应信息。当检测到改节点微服务调用响应正常后，恢复该调用链路。
+
+再Spring Cloud 框架里，熔断机制通过Hystrix实现，Hystrix会监控微服务间调用情况，
+当失败调用到一定阈值时，缺省是5秒内20次调用失败，就会启动熔断机制，其注解是@HystrixCommand
+
+
+```java
+// 服务熔断
+@HystrixCommand(fallbackMethod = "paymentCircuitBreaker_fallback" //  回退方法
+        ,commandProperties = {
+        @HystrixProperty(name = "circuitBreaker.enable",value = "true"), // 是否开启断路器
+        @HystrixProperty(name = "circuitBreaker.requestVolumeThreshold",value = "10"), //请求次数
+        //错误的请求比例，达到后跳闸 (例如10s内，10次请求，失败次数比例达到50%跳闸)
+        @HystrixProperty(name = "circuitBreaker.errorThresholdPercentage",value = "50"),
+        //自我修复的活窗口时长
+        @HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds",value = "10000")
+})
+public String paymentCircuitBreaker(@PathVariable("id") String id){
+    if (Integer.valueOf(id) <0){
+        throw new RuntimeException("负数");
+    }
+    return UUID.randomUUID().toString();
+}
+
+public String paymentCircuitBreaker_fallback(@PathVariable("id") String id){
+   return "id 不能为负数";
+}
+```
+
+服务熔断原理：
+
+熔断类型：
+1. 熔断打开 请求不在调用当前微服务，内部设置时钟为MTTR(平均故障处理时间),当打开时长达到所设置时钟则进入半熔断状态
+2. 熔断关闭 熔断关闭不对服务进行熔断
+3. 熔断半开 部分请求根据规则调用当前服务，如果请求成功且符合规则 则认为当前服务已恢复正常，关闭熔断。
+
+涉及断路器的三个重要参数：快照时间窗，请求总数阈值，错误百分比阈值。
+1. 快照时间窗 断路器确定是否需要打开需要统计一些请求和错误数据，而统计的时间范围就是快照时间窗，默认为最近的10s。
+2. 请求总数阈值 再快照时间窗口内，必须满足请求总数阈值才有资格熔断。默认20,意味着在10s内，如果hystrix命令的调用次数不足20次，
+即使所有的请求都超时，或者其他原因失败，断路器也不会打开。
+3. 错误百分比阈值 当请求总数在快照时间内超过了阈值，比如发生了30次调用，如果在这30次内，有15次调用发生了异常，即超过50%的错误百分比，
+在默认设置50%的情况下，这时候就会将断路器打开。
+
+断路器开启和关闭条件：
+1. 当满足一定得阈值时，（默认是10秒内超过20次请求）
+2. 当失败率满足一定得阈值时（默认是10秒内超过50%得请求失败）
+3. 当达到1，2阈值时，断路器将会开启
+4. 当断路器开启得时候，所有请求都不会被转发
+5. 一段时间后（默认是5秒），这个时候断路器将处于半开状态，会让其中一个请求进行转发，如果成功，断路器将被关闭，如果失败，断路器继续开启。
+
+断路器打开之后：
+1. 再有请求调用得时候，将不会调用主逻辑，而是直接调用服务降级fallback，通过断路器，实现了自动发现错误并将降级逻辑切为
+主逻辑，减少响应延迟效果。
+
+2. 原来得主逻辑怎么恢复？
+Hystrix实现了自动恢复功能，当断路器打开后，Hystrix会启动一个休眠时间窗，降级逻辑成为临时主逻辑，
+当休眠时间窗到期，断路器进入半开状态，释放一次请求到原来得主逻辑上，如果此次请求成功，那么断路器将继续闭合，主逻辑恢复，
+如果请求失败，断路器继续进入打开状态，休眠时间窗重置。
+
+
+服务限流：
+
+
+
+Dashboard
+
+http://localhost:9001/hystrix
+
+配置需要被监控地服务
+```
+    @Bean
+    public ServletRegistrationBean getServlet() {
+        HystrixMetricsStreamServlet streamServlet = new HystrixMetricsStreamServlet();
+        ServletRegistrationBean registrationBean = new ServletRegistrationBean(streamServlet);
+        registrationBean.setLoadOnStartup(1);
+        registrationBean.addUrlMappings("/hystrix.stream");
+        registrationBean.setName("HystrixMetricsStreamServlet");
+        return registrationBean;
+    }
+```
+http://hystrix-app:port/actuator/hystrix.stream
+
+服务网关：
+
+zuul路由网关：
+
+Gateway新一代网关：
+
+是什么
+
+Spring Cloud Gateway旨在为微服务架构提供一种简单而有效的统一的API路由管理方式，
+Spring Cloud Gateway 可以看做是一个 Zuul 1.x 的升级版和代替品，比 Zuul 2 更早的使用 Netty 实现异步 IO，从而实现了一个简单、比 Zuul 1.x 更高效的、与 Spring Cloud 紧密配合的 API 网关。
+Spring Cloud Gateway作为Spring Cloud生态系中的网关，目标是替代ZUUL，其不仅提供统一的路由方式，并且基于Filter链的方式
+提供了网关基本的功能，例如：安全，监控/埋点，和限流等。
+
+可以做什么？
+
+反向代理，鉴权，流量控制，熔断，日志监控
+
+为什么选择Gateway？
+
+1. zuul1.0 进入维护阶段
+2. Gateway是基于异步非阻塞模型进行开发地，Spring Cloud 没有整合zuul 2.x
+3. 动态路由：可以匹配任何请求属性；可以对路由指定Predicate(断言)和Filter（过滤器）
+；集成Hystrix的断路器功能；集成Spring Cloud服务发现功能；易于编写Predicate(断言)和Filter（过滤器）
+
+zuul1.x模型：
+
+Gateway工作流程：
+
+3大核心概念：Route(路由)，Predicate(断言)，Filter（过滤器）
+Route： 路由是构建网关的基本模块，它由ID,目标URI,一系列断言和过滤器组成，如果断言为true则匹配该路由
+Predicate(断言)： 可以匹配HTTP请求中的所有内容（例如请求头，请求参数），如果请求和断言相匹配则进行路由
+Filter（过滤器）： spring框架中的GatewayFilter的实例，使用过滤器可以在请求被路由前或者之后对请求进行修改。
+
+web请求，通过一些匹配条件，定位到真正的服务节点。并在转发过程的前后，进行一些精细的控制。
+Predicate就是匹配条件，Filter则是一个无所不能的拦截器，由了这2个元素，再加上目标uri，就可以实现一个具体的路由。
+
+客户端向Spring Cloud Gateway 发出请求，然后在Gateway Handler Mapping中找到请求相匹配的路由，将其发送到GateWay Web handler.
+
+handler再通过指定的过滤器来将请求发送到实际的服务来执行业务逻辑，然后返回。
+Filter 在 ”pre“类型中可以做参数校验，权限校验，流量监控，协议转换等，
+在”post"类型的过滤器中可以做出响应内容，响应头的修改，日志输出，流量监控等。
+
+Gateway核心逻辑就是路由转发+执行过滤器链
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+当前服务器 磁盘剩余 17G，共40G
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/vda1        40G   21G   17G  55% /
+
+java启动增加参数 -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -XX:+PrintGCDateStamps -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=./ -Xms896m -Xmx1024m
+
+duoge-auth 1888.0MB
+
+duoge-codegen 1888.0MB
+
+duoge-gateway 1888.0MB
+
+duoge-register(nacos) 1888.0MB
+
+duoge-upms 1888.0MB
+
+nginx (server admin.tuokeshu.top 映射路径/data/biz/tks-admin/dist/；www.tuokeshu.top 映射路径 /data/www/mini/，反向代理gateway(9999端口))
+
+redis 默认配置
+
+mysql 
+
+备份操作
+./mysql/bin/mysqldump -h127.0.0.1 -P3306 -uxxx-pxxx --quick --events --routines -B acm acm_job eccs > ./export_mysql_data.sql
+导入
+./mysql/bin/mysql -h127.0.0.1 -P33061 -uroot -p****** < ./export_mysql_data.sql
+
+
+./mysqldump  -uroot -p --quick --events --routines -B duogex duogex_ac duogex_config > ./export_mysql_data.sql
