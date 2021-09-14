@@ -1176,3 +1176,9 @@ fc-cache -fv
 查看是否已经安装对应的字体：fc-list
 fc-cache -fv 命令用来刷新linux的字体缓存，使其立刻生效		
 		
+		
+```
+# 当前目录下查找 存在OracleDatabase 的文件
+grep  -r -A 10 -B 10  -e 'OracleDatabase'  *
+grep  -r -A 10 -B 10  'OracleDatabase'  *
+```

@@ -546,3 +546,176 @@ System.out.println(integer);// 4
 System.out.println(integer1);// null
 System.out.println(map);// {1=1, 2=2, 3=4}
 ```
+
+
+##### Java 8 新的日期时间 API
+
+新的时区类 java.time.ZoneId 是原有的 java.util.TimeZone 类的替代品。 
+ZoneId对象可以通过 ZoneId.of() 方法创建，也可以通过 ZoneId.systemDefault() 获取系统默认时区。
+
+```java
+ZoneId zoneId = ZoneId.of("Asia/Shanghai");
+ZoneId systemZoneId = ZoneId.systemDefault();
+# 所有“区域/城市”
+Set<String> zoneIds = ZoneId.getAvailableZoneIds();
+
+# 老的时区类 TimeZone，转化方法
+ZoneId oldToNewZoneId = TimeZone.getDefault().toZoneId();
+
+```
+of() 方法接收一个“区域/城市”的字符串作为参数，你可以通过 getAvailableZoneIds() 方法获取所有“区域/城市”字符串：
+
+有了 ZoneId，我们就可以将一个 LocalDate、LocalTime 或 LocalDateTime 对象转化为 ZonedDateTime 对象：
+
+```java
+LocalDateTime localDateTime = LocalDateTime.now();
+
+/**
+* ZonedDateTime 对象由两部分构成，LocalDateTime 和 ZoneId，其中 2018-03-03T15:26:56.147 部分为 LocalDateTime，
+* +08:00[Asia/Shanghai] 部分为ZoneId。
+*/
+ZonedDateTime zonedDateTime = ZonedDateTime.of(localDateTime, zoneId);
+
+
+/**
+* 另一种表示时区的方式是使用 ZoneOffset，它是以当前时间和 世界标准时间（UTC）/格林威治时间（GMT） 的偏差来计算，例如：
+*/
+ZoneOffset zoneOffset = ZoneOffset.of("+08:00");
+LocalDateTime localDateTime = LocalDateTime.now();
+OffsetDateTime offsetDateTime = OffsetDateTime.of(localDateTime, zoneOffset);
+
+
+```
+
+##### Instant
+Instant类在Java日期与时间功能中，表示了时间线上一个确切的点，定义为距离初始时间的时间差（初始时间为GMT 1970年1月1日00:00）经测量一天有86400秒，
+从初始时间开始不断向前移动。
+
+```java
+/**
+* 可以通过Instant类的工厂方法创建一个Instant实例
+*/
+Instant now = Instant.now();  // Instant对象，表示当前时间
+
+int nano = now.getNano(); // 更精确的纳秒精度
+/**
+ * The number of seconds from the epoch of 1970-01-01T00:00:00Z.
+ */
+long epochSecond = now.getEpochSecond();
+
+Instant later   = now.plusSeconds(3); // 建了一个Instant表示三秒后
+Instant earlier = now.minusSeconds(3); // 创建了一个Instant表示三秒前
+
+```
+一个Instant对象里有两个域：
+1. long seconds
+2. int nanos
+
+Instant的计算
+* plusSeconds()
+* plusMillis()
+* plusNanos()
+* minusSeconds()
+* minusMillis()
+* minusNanos()
+
+Instant就是时间戳，给它附加上一个时区，就可以创建出ZonedDateTime
+
+```java
+Instant now = Instant.now(); // 2021-09-14T02:17:50.603Z
+ZonedDateTime dateTime = now.atZone(ZoneId.systemDefault()); // 2021-09-14T10:17:50.603+08:00[Asia/Shanghai]
+```
+
+##### LocalDate
+LocalDate类是Java 8中日期时间功能里表示一个本地日期的类，它的日期是无时区属性的。 
+
+##### LocalTime
+LocalTime类是Java 8中日期时间功能里表示一整天中某个时间点的类，它的时间是无时区属性的.
+
+##### LocalDateTime
+LocalDateTime类是Java 8中日期时间功能里，用于表示当地的日期与时间的类，它的值是无时区属性的。
+可以将其视为Java 8中LocalDate与LocalTime两个类的结合。
+
+LocalDateTime，LocalDate，LocalTime类的值是不可变的，所以其计算方法会返回一个新的LocalDateTime，LocalDate，LocalTime实例。
+
+##### ZonedDateTime
+ZonedDateTime类是Java 8中日期时间功能里，用于表示带时区的日期与时间信息的类。
+
+##### 时区
+时区是用ZoneId类表示的，你可以使用ZoneId.now()或ZoneId.of(“xxx”)来实例化：
+```java
+// of() 方法的参数是时区的ID，如“UTC+1”指距离UTC（格林威治时间）有一小时的时差
+// 可以使用另一种方式表示zone id，即使用地区名字，
+ZoneId zoneId = ZoneId.of("UTC+1");
+ZoneId zoneId2 = ZoneId.of("Europe/Copenhagen");
+ZoneId zoneId3 = ZoneId.of("Europe/Paris");
+```
+
+##### DateTimeFormatter
+```
+DateTimeFormatter formatter = DateTimeFormatter.BASIC_ISO_DATE;
+String formattedDate = formatter.format(LocalDate.now()); // 20210914
+String formattedZonedDate = formatter.format(ZonedDateTime.now()); // 20210914+0800   位于UTC+8时区。
+```
+
+##### Duration
+一个Duration对象表示两个Instant间的一段时间。
+一个Duration对象里有两个域：纳秒值（小于一秒的部分），秒钟值（一共有几秒），他们的组合表达了时间长度。
+```
+long days = duration.toDays();              // 这段时间的总天数
+long hours = duration.toHours();            // 这段时间的小时数
+long minutes = duration.toMinutes();        // 这段时间的分钟数
+long seconds = duration.getSeconds();       // 这段时间的秒数
+long milliSeconds = duration.toMillis();    // 这段时间的毫秒数
+long nanoSeconds = duration.toNanos();      // 这段时间的纳秒数
+
+```
+
+增加和减少日期
+
+```
+LocalDate date = LocalDate.of(2017, 1, 5);          // 2017-01-05
+
+LocalDate date1 = date.withYear(2016);              // 修改为 2016-01-05
+LocalDate date2 = date.withMonth(2);                // 修改为 2017-02-05
+LocalDate date3 = date.withDayOfMonth(1);           // 修改为 2017-01-01
+
+LocalDate date4 = date.plusYears(1);                // 增加一年 2018-01-05
+LocalDate date5 = date.minusMonths(2);              // 减少两个月 2016-11-05
+LocalDate date6 = date.plus(5, ChronoUnit.DAYS);    // 增加5天 2017-01-10
+
+LocalDate date7 = date.with(nextOrSame(DayOfWeek.SUNDAY));      // 返回下一个距离当前时间最近的星期日
+LocalDate date9 = date.with(lastInMonth(DayOfWeek.SATURDAY));   // 返回本月最后一个星期六
+
+// 默认提供的方法不能满足你的需求，你还可以创建自定义的 TemporalAdjuster 接口的实现
+// 比如给定一个日期，计算该日期的下一个工作日（不包括星期六和星期天）：
+LocalDate date = LocalDate.of(2017, 1, 5);
+date.with(temporal -> {
+    // 当前日期
+    DayOfWeek dayOfWeek = DayOfWeek.of(temporal.get(ChronoField.DAY_OF_WEEK));
+
+    // 正常情况下，每次增加一天
+    int dayToAdd = 1;
+
+    // 如果是星期五，增加三天
+    if (dayOfWeek == DayOfWeek.FRIDAY) {
+        dayToAdd = 3;
+    }
+    
+    // 如果是星期六，增加两天
+    if (dayOfWeek == DayOfWeek.SATURDAY) {
+        dayToAdd = 2;
+    }
+
+    return temporal.plus(dayToAdd, ChronoUnit.DAYS);
+});
+
+// 获取2个日期区间的所有日期
+public static Set<String> getMiddleDate(LocalDate begin, LocalDate end) {
+    Set<String> localDateList = new HashSet<>();
+    long distance = ChronoUnit.DAYS.between(begin, end);
+    Stream.iterate(begin, d -> d.plusDays(1)).limit(distance + 1).forEach(f -> localDateList.add(f.toString()));
+    return localDateList;
+}
+
+```

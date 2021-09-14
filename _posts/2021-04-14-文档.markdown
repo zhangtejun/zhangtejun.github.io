@@ -49,6 +49,27 @@ private static final String DEFAULT_SEARCH_LOCATIONS = "classpath:/,classpath:/c
 优先级相同的情况下，同时有application.properties和application.yml，那么application.properties里面的属性就会覆盖application.yml里的属
 性，因为properties比yml优先加载。
 
+application.yml 是用户级资源配置项
+
+bootstrap.yml 是系统级的，优先级更高，加载时机也优先于application.yml。
+
+
+
+
+##### The Bootstrap Application Context（引导上下文）
+SpringBoot 项目中如果没有依赖 spring-cloud-context 的话，是不会读取bootstrap.properties 文件，bootstrap.yml配置是SpringCloud项目才会用到的。
+
+一个spring cloud应用会创建一个“bootstrap”context，它是主应用的parent context。它负责加载外部资源的配置属性并且解释本地外部配置文件中的属性。
+
+默认情况下，bootstrap属性（并非是bootstrap.properties而是那些在bootstrap阶段加载的属性）是以高优先级的方式添加的，所以无法被本地配置覆盖。
+
+bootstrap context和main context使用不同的方法定位外部配置，你可以使用bootstrap.yml来替代application.yml来为bootstrap context添加配置，
+这样就可以区分开bootstrap context和main context。
+
+application.yml 用户级配置
+bootstrap.yml 系统级配置
+
+
 `https://start.spring.io/actuator/info`
 
 spring cloud 
@@ -412,22 +433,148 @@ Filter 在 ”pre“类型中可以做参数校验，权限校验，流量监控
 
 Gateway核心逻辑就是路由转发+执行过滤器链
 
+Spring Gateway支持两种方式提供路由服务，其一是配置文件启用，其二则是通过代码达到目的。
+
+Gateway默认转发是全路径的，设置StripPrefix=1表示从二级url路径转发，即http://localhost:port/activity/test将会转发到http://{activity}/test
+```
+spring:
+  application:
+    name: gateway
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true # 开启后，从注册中心动态创建路由，利用微服务名进行路由
+      routes:
+        - id: activity-route # 路由ID 没有固定规则，要求唯一，建议关联服务名
+          uri: lb://activity # 路由匹配后，提供服务的路由地址
+          predicates:
+            - Path=/activity/** # 断言 路径先匹配的进行路由
+          filters:
+            - StripPrefix=1
+
+        - id: activity-route2 # 路由ID 没有固定规则，要求唯一，建议关联服务名
+          uri: lb://activity # 路由匹配后，提供服务的路由地址
+          predicates:
+            - Path=/activity/** # 断言 路径先匹配的进行路由
+            - After=2018-12-25T14:33:47.789+08:00 # 使用的是时间作为匹配规则，只要当前时间大于设定时间，路由才会匹配请求。
+            - Before=2018-12-25T14:33:47.789+08:00 # 使用时间作为匹配规则，只要当前时间小于设定时间，路由才会匹配请求。
+            - Between=2018-12-25T14:33:47.789+08:00, 2018-12-26T14:33:47.789+08:00 # 使用两个时间作为匹配规则，只要当前时间大于第一个设定时间，并小于第二个设定时间，路由才会匹配请求。
+            - Cookie=cookiename, cookievalue # 使用的是cookie名字和正则表达式的value作为两个输入参数，请求的cookie需要匹配cookie名和符合其中value的正则。 路由匹配请求存在cookie名为cookiename，cookie内容匹配cookievalue的，将请求转发。
+            - Header=X-Request-Id, \d+ # 两个参数，一个header的name，一个是正则匹配的value。路由匹配存在名为X-Request-Id，内容为数字的header的请求，将请求转发
+            - Host=**.somehost.org,**.anotherhost.org # 使用的是host的列表作为参数，host使用Ant style匹配。 路由会匹配Host诸如：www.somehost.org 或 beta.somehost.org或www.anotherhost.org等请求。
+            - Method=GET # 通过HTTP的method来匹配路由。
+            - Path=/foo/{segment},/bar/{segment} # 使用的是path列表作为参数，使用Spring的PathMatcher匹配path，可以设置可选变量。 上面路由可以匹配诸如：/foo/1 或 /foo/bar 或 /bar/baz等
+            - Query=baz # 通过一个或两个参数来匹配路由，一个是查询的name，一个是查询的正则value。路由会匹配所有包含baz查询参数的请求
+            - Query=foo, ba. # 路由会匹配所有包含baz，并且baz的内容为诸如：bar或baz等符合ba.正则规则的请求。
+            - RemoteAddr=192.168.1.1/24 # 通过无类别域间路由(IPv4 or IPv6)列表匹配路由。
+            filters:
+            - AddRequestHeader=X-Request-Foo, Bar # 过滤器工厂会在请求头加上一对请求头，名称为X-Request-Foo，值为Bar。
+            - StripPrefix=1
+```
+
+编程方式实现
+```
+@Bean
+public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
+        return builder.routes()
+                .route(r -> r.path("/activity/**")
+                        .filters(f -> f.stripPrefix(1).filter(new TestGetWayFilter()).addResponseHeader("X-Response-Default-Foo", "Default-Bar"))
+                        .uri("lb://activity")
+                        .order(0)
+                        .id("activity-route")
+                )
+                .build();
+ }
+```
+
+Route Predicate Factories
+
+filter
+
+Filter则是一个无所不能的拦截器，由了这2个元素，再加上目标uri，就可以实现一个具体的路由。
+路由过滤器可用于修改进入的HTTP请求和返回的响应。
+
+生命周期只有2个，pre和post，即业务逻辑执行前和执行后。种类有2种，单一的和全局的filter。
+
+自定义过滤器
+
+在spring Cloud Gateway中，过滤器需要实现GatewayFilter和 Ordered 2个接口，Ordered中的int getOrder()方法是来给过滤器设定优先级别的，值越大则优先级越低。
+
+全局日志，网关鉴权
 
 
+**分布式配置中心**
+集中的，动态的配置管理，提交集中化外部配置支持。
 
+配置中心的出现是因为微服务的数量增多，导致配置文件有可能出现大量的冗余（比如说数据库的连接），
+所以就将冗余的部分提取出来作为一个配置中心，一般都放在github上，用配置去提取。
 
+```
+erver:
+  port: 3344
 
+spring:
+  application:
+    name:  cloud-config-center #注册进Eureka服务器的微服务名
+  cloud:
+    config:
+      server:
+        git:
+          uri: git@github.com:xxxx/springcloud-config.git #GitHub上面的git仓库名字
+        ####搜索目录
+          search-paths:
+            - springcloud-config
+      ####读取分支
+      label: master
 
+#服务注册到eureka地址
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:7001/eureka
 
+##rabbitmq相关配置,暴露bus刷新配置的端点
+management:
+  endpoints: #暴露bus刷新配置的端点
+    web:
+      exposure:
+        include: 'bus-refresh'
+```
 
+客户端配置
+```
+spring:
+  application:
+    name: lttt                     #指定了配置文件的应用名
+  cloud:
+    # Config 客户端配置
+    config:
+      uri: http://localhost:7011/        #Config server的uri
+      profile: dev                       #指定的环境
+      label: master                      #指定分支
+      name: config                       #配置文件名称
+server:
+  port: 7002
 
+#服务注册到eureka地址
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:7001/eureka
+```
 
+分布式配置动态刷新
 
+首先在config-client中添加如下依赖，spring-boot-starter-actuator，在application.properties中配置忽略权限拦截：management.security.enabled=false。
 
+通过 POST 方法请求 localhost:8080/actuator/refresh 刷新配置文件。
 
+在需要修改的类中增加 @RefreshScope 注解,就会开启刷新 @Value 的值。
 
+多个微服务客户端，每个微服务都需要发送一次请求取刷新,可否广播，一次通知，处处生效？ 暂时做不到（需要引入消息总线）
 
-
+##### Bus消息总线
 
 
 
